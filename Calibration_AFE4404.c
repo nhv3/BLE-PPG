@@ -9,6 +9,7 @@
 */
 #include "Calibration_AFE4404.h"
 #include "AFE4404.h"
+#include <stdio.h>
 
 
 /*******************************************************************************/
@@ -75,7 +76,7 @@ unsigned int Ambient_DAC_enabled = 0; 							// Indicates whether the AMB_DAC ca
 
 CALIBRATION_STATES AmbientDACcalibration_state = sInit;
 CALIBRATION_STATES Gaincalibration_state = sInit;
-CALIBRATION_MODES calibration_mode = sAmbientDAC;
+CALIBRATION_MODES calibration_mode = sAmbientDAC; //changed this to be the new starting state
 PERIODIC_MODES PeriodicCalibration_state = sFreeze_periodic;
 OFFSETDAC_CALIB_STATES OffsetDAC_code_Est_state = sOffsetDACInit;
 CALIB_ENABLE Calibration_en;
@@ -95,7 +96,7 @@ unsigned int Enable_sep_gain = 1;
 unsigned int DC_can = 0;
 int LED_pulse_width = 0;
 // Selection of either LED1 or LED2 or LED3 in MODE1 (HRM only mode)
-char LED_Sel = 1;
+extern char LED_Sel;
 RF_VALUES RFValue_Init_GainCal = s2M; 							// Initial Rf for Gain calibration (if ambient dac is not enabled)
 unsigned int periodic_cal_req = 0;
 unsigned long Ipleth = 1875;
@@ -220,17 +221,22 @@ void setCfValue(int Cfvalue)
 *
 *********************************************************************/
 void initCalibrationRoutine(void) 
-{
+{   
+        AFE44xx_Current_Register_Settings[0] = 0;
+        AFE44xx_Current_Register_Settings[1] = 0;
+        AFE44xx_Current_Register_Settings[2] = 0;
+        AFE44xx_Current_Register_Settings[3] = 0;
+        AFE44xx_Current_Register_Settings[4] = 0;
+
 	unsigned int Calibration_enabled = 0;
 	unsigned int Ipleth_num;
   
 	Calibration = 1;
 	Calibration_en.AMB = 1; // Check for calibration modes
 	Calibration_en.GAIN = 1;
-	Calibration_en.PERIODIC = 1;
+	Calibration_en.PERIODIC = 0;
   
 	// Selection of either LED1 or LED2 or LED3 in MODE1 (HRM only mode)
-	LED_Sel = 1;
   
 	Ipleth_num = 4;
 	Ipleth = Ipleth_array[Ipleth_num];
@@ -307,27 +313,31 @@ void initCalibrationRoutine(void)
 	if (Calibration_enabled != 0) 
 	{
 		AFE44xx_Current_Register_Settings[2] = 0;
-    //AFE44xx_Current_Register_Settings[1] = 0;
+                AFE44xx_Current_Register_Settings[2] = 0;
+                 //AFE44xx_Current_Register_Settings[1] = 0;
 		// Mods to support selection of either LED1 or LED2 or LED3 in MODE1 (HRM only mode) - 03/24/2015
 		if (LED_Sel == 2) 
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED2_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB2_mask));
+                        printf("LED 2\n");
 		}
 		else if (LED_Sel == 3) 
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED3_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB3_mask));
+                         printf("LED 3\n");
 		}
 		else //Default is LED1
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED1_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB1_mask));
+                         printf("LED 1\n");
 		}
 
 		AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000); // write mode
 		AFE4404_Reg_Write(AFE_LEDCNTRL, AFE44xx_Current_Register_Settings[0]);    //0x20
-    //AFE4404_Reg_Write(AFE_TIAGAIN, AFE44xx_Current_Register_Settings[1]);
+                //AFE4404_Reg_Write(AFE_TIAGAIN, AFE44xx_Current_Register_Settings[1]);
 		AFE4404_Reg_Write(AFE_TIAAMBGAIN, AFE44xx_Current_Register_Settings[2]);
 		AFE4404_Reg_Write(AFE_DAC_SETTING_REG, AFE44xx_Current_Register_Settings[3]);
 		AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); // read mode
@@ -619,6 +629,7 @@ switch (Gaincalibration_state)
 	// Mods to support selection of either LED1 or LED2 or LED3 in MODE1 (HRM only mode) - 03/24/2015
 	if (LED_Sel == 2) 
 	{
+                printf("LED 2 Initialize :::::::::: Completed \n");
 		// shifts the ILED code according to the current field corresponding to the LED number
 		LEDInterimCode = (ILED_CURR_MIN_code << LED2_reg_shift);
 		//updates the ILED register value
@@ -1131,27 +1142,54 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
 		case (sInitialize):
 		//calls the initCalibrationRoutine
 		initCalibrationRoutine();
+                printf("Calib Init ::: Completed \n");
 		break;
     
 		case (sAmbientDAC):
 		//calls the AmbientCancellation function
 		AmbientCancellation(LEDVALUE, AMBVALUE);
+                //printf("Amb Cancel ::: Completed \n");
 		break;
     
 		case (sGain):
 		//calls the GainCalibration function
-    GainCalibration(LEDVALUE - AMBVALUE, LEDVALUE);
+                GainCalibration(LEDVALUE - AMBVALUE, LEDVALUE);
+                //printf("Gain Calib ::: Completed \n");
 		break;
     
 		case (sPeriodic):
 		//calls the PeriodicCalibration function
-    PeriodicCalibration(LEDVALUE, AMBVALUE);
+                PeriodicCalibration(LEDVALUE, AMBVALUE);
 		break;
     
+                //We will modify the calibiration method to calibrate all three LEDS based on ambient values captured. The first LED to start is 1 -> 3
 		case (sFinish):
-		//ends the calibration
-		Calibration = 0;
-		break;
+                    //ends the calibration
+                    if(LED_Sel == 1)
+                    {
+                      LED_Sel = 2;
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+                      printf("LED 1 Calib ::: Completed \n");
+                    }
+
+                    else if(LED_Sel == 2)
+                    {
+                      //LED_Sel = 3;
+                      Calibration = 0;
+                      //calibration_mode = sInitialize;
+                      printf("LED 2 Calib ::: Completed \n");
+
+                    }
+
+                    else
+                    {
+                      LED_Sel = 4;
+                      Calibration = 0; // This will cancel the calirbation routine 
+                      calibration_mode = sInitialize;
+                      printf("LED 3 Calib ::: Completed \n");
+                    }
+                    break;
     
 		default:
 		break;
@@ -1514,8 +1552,8 @@ switch (OffsetDAC_code_Est_state)
     if (AMB_DAC_VALUE_AMB != 0)
     {
 		Meas_DC_OFFSET_DAC_code_step[AMB_DAC_VALUE_AMB] = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		//ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		//ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
+		ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
+		ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
     }
     AMB_DAC_VALUE_AMB++;
     if (AMB_DAC_VALUE_AMB == 16) //2

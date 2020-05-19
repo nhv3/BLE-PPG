@@ -49,6 +49,7 @@
 /**********************************************************************************************************/
 /*                                              BEGIN GOLABAL DECLARATIONS                                */
 /**********************************************************************************************************/
+#define PPG_COLLECTION_TIME   40000
 
 #define DEVICE_NAME                     "GUTSENS"                 /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "Stanford University"   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -61,7 +62,7 @@
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                   0                                       /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
-#define SENSOR_CHAR_TIMER_INTERVAL APP_TIMER_TICKS(30000)                          //1000 ms intervals
+#define SENSOR_CHAR_TIMER_INTERVAL APP_TIMER_TICKS(PPG_COLLECTION_TIME)                          //1000 ms intervals
 
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
@@ -88,12 +89,14 @@ volatile int readDataFlag = 0;
 volatile int g_OneSecondFlag=0;
 volatile int apptimerrunning = 0;
 volatile int issue_disconnect = 0;
+volatile int calibFinsihed = 0;
+char LED_Sel = 1;
 int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
 int prfcount = 0;
 uint16_t prfcount=0;
 bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
-extern char LED_Sel;
+
 extern int Calibration;  // Global variable which is controlled by the library. Keep checking the status of the variable
 extern long CTR;
 extern unsigned long AFE44xx_Current_Register_Settings[5];
@@ -107,6 +110,8 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 ble_os_t m_sensor_service; //  Declare a service structure for sensor application
 APP_TIMER_DEF(m_sensor_char_timer_id); // Declare an app_timer id variable and define sensor timer interval and define a timer interval
 static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_SERVICE_UUID, BLE_UUID_TYPE_BLE} }; // Use UUIDs for service(s) used in ysensor application.
+
+unsigned long AFE_Buffer[6]; 
 
 /**********************************************************************************************************/
 /*                                              BEGIN FUNCTION DECLARATIONS                               */
@@ -446,11 +451,14 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
     //When connected; start app timer to let the data be captured and sent out
     app_timer_start(m_sensor_char_timer_id, SENSOR_CHAR_TIMER_INTERVAL, NULL);
-
+    
+    AFE4404_Disable_HWPDN();
+    AFE4404_Trigger_HWReset();
     AFE4404_Init();
     AFE4404_ADCRDY_Interrupt_Enable();
     apptimerrunning = 1;
-
+    prfcount = 0;
+    Calibration = 1;
     break;
 
   case BLE_GAP_EVT_PHY_UPDATE_REQUEST: {
@@ -690,6 +698,36 @@ void DAC_CALIBRATION_AUTOSTART(void) {
   }
 }
 
+//Routine handler for calibrating each LED individually 
+void postCalib(unsigned long ambient)
+{
+    switch(LED_Sel)
+    {
+
+      case 1:
+        CalibrateAFE4404(AFE_Buffer[0], ambient);
+      break;
+    
+      case 2: 
+        CalibrateAFE4404(AFE_Buffer[1], ambient);
+      break;
+
+      case 3: 
+        CalibrateAFE4404(AFE_Buffer[2], ambient);
+      break; 
+
+      case 4: 
+        LED_Sel = 1;
+        Calibration = 0;
+      break; 
+
+      default: 
+      break;
+    
+    }
+    
+}
+
 /**********************************************************************************************************/
 /*                                                  MAIN APP ENTRY                                        */
 /**********************************************************************************************************/
@@ -716,9 +754,11 @@ int main(void) {
   AFE4404_Init(); //Initilaizes all the ports needed perihperal to the AFE
 
   printf("STEP 2 ::: PPG AFE Bring Up ::: Completed\n");
- //Enable the AFE interrupts for DAC calibration
+
   AFE4404_ADCRDY_Interrupt_Enable();
   DAC_CALIBRATION_AUTOSTART();
+  LED_Sel = 1;
+  initCalibrationRoutine();
 
   //Power Down the AFE after the DAC-Calibration is completed
   AFE4404_Enable_HWPDN();
@@ -739,7 +779,6 @@ int main(void) {
 
   nrf_delay_ms(20);
 
-
   /*ENTER WHILE LOOP*/
   while (1) {
 
@@ -749,38 +788,42 @@ int main(void) {
       AFE4404_ADCRDY_Interrupt_Disable();              //Stop the processing and go ahead with dumping the data in;
       readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
 
+      //Store reads locally into buffer
+      AFE_Buffer[0] = AFE4404_Reg_Read(42);
+      AFE_Buffer[1] = AFE4404_Reg_Read(44);
+      AFE_Buffer[2] = AFE4404_Reg_Read(43);
+      AFE_Buffer[3] = AFE4404_Reg_Read(45);
+
       int32_t temperature = 0;
       int32_t Red = 0;
       int32_t Green = 0;
       int32_t Nir = 0;
 
       sd_temp_get(&temperature); //Get temperature
-      Red = (int32_t)(AFE4404_Reg_Read(42)); //Get red val reg
-      Green = (int32_t)(AFE4404_Reg_Read(44)); //Get green val reg
-      Nir = (int32_t)(AFE4404_Reg_Read(43)); //Get NIR val reg
+      Red = (int32_t)(AFE_Buffer[0]); //Get red val reg
+      Green = (int32_t)(AFE_Buffer[1]); //Get green val reg
+      Nir = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
 
       sensor1_characteristic_update(&m_sensor_service, &temperature);
       sensor2_characteristic_update(&m_sensor_service, &Green);
       sensor3_characteristic_update(&m_sensor_service, &Red);
       sensor4_characteristic_update(&m_sensor_service, &Nir);
 
-      if (CALIBRATION_ENABLED == true) {
-        if (Calibration == 1) {
-          if (LED_Sel == 2) {
-            CalibrateAFE4404(AFE44xx_SPO2_Data_buf[0], AFE44xx_SPO2_Data_buf[3]);
-          } else if (LED_Sel == 3) {
-            CalibrateAFE4404(AFE44xx_SPO2_Data_buf[1], AFE44xx_SPO2_Data_buf[3]);
-          } else // Default LED_Sel = 1
-          {
-            CalibrateAFE4404(AFE44xx_SPO2_Data_buf[2], AFE44xx_SPO2_Data_buf[3]);
-          }
+      //We want Calibrate the system each time that we wake-up to start measuring values 
+      if(Calibration == 1) //first time we enter the statement 
+      {
+        if(CALIBRATION_ENABLED == true)
+        {
+          postCalib(AFE_Buffer[3]);
         }
-
-        prfcount++;
-        if (prfcount == 100) {
-          g_OneSecondFlag = 1;
+      }
+    
+      prfcount++;
+      if (prfcount == 10000) 
+      {
+          //g_OneSecondFlag = 1;
+          Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor 
           prfcount = 0;
-        }
       }
 
       //Renable the device
