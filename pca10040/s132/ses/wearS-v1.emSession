@@ -68,7 +68,7 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="27" y="443" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="423" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="31" y="788" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="750" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="12" y="118" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.c" selected="0" top="88" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="124" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../I2C.c" selected="0" top="118" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="14" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AD5593R.c" selected="0" top="0" codecName="Default"/>

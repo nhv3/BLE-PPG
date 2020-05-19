@@ -786,6 +786,6 @@ int main(void) {
       //Renable the device
       AFE4404_ADCRDY_Interrupt_Enable();
 
-    } //End of while
+    } //End of while change log
   }
 } //End of file
