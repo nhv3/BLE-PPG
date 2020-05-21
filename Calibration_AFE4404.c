@@ -84,10 +84,21 @@ FLAGS flag;
 SYSTEM_PARAMS system;
 SIGNAL_PARAMS signal;
 
-int Calibration = 1;  						// Indicates whether calibration is ON
+volatile int Calibration = 1;  						// Indicates whether calibration is ON
 unsigned int Periodic_started = 0; 			// Indicates whether periodic calibration has started or not
 int Cf_array[8] = { 250, 250, 250, 250, 250, 250, 250, 250 };
 unsigned long AFE44xx_Current_Register_Settings[5] = { 0, 0, 0, 0, 0 }; // Array that holds the latest AFE register settings
+
+unsigned long LED1 = 0;
+unsigned long GAIN1 =0;
+unsigned long DAC1 =0;
+unsigned long LED2 =0;
+unsigned long GAIN2 =0;
+unsigned long DAC2 =0;
+unsigned long LED3 =0;
+unsigned long GAIN3 =0;
+unsigned long DAC3 =0;
+
 // For any AFE register change - update the appropriate element
 // in the array corresponding to the register
 // 0 for register 0x22 - LED current
@@ -1164,20 +1175,32 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
     
                 //We will modify the calibiration method to calibrate all three LEDS based on ambient values captured. The first LED to start is 1 -> 3
 		case (sFinish):
-                    //ends the calibration
+
                     if(LED_Sel == 1)
                     {
                       LED_Sel = 2;
                       Calibration = 1;
                       calibration_mode = sInitialize;
+
+                      //Save all of the computed values
+                      DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask;
+                      LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
+                      GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
                       printf("LED 1 Calib ::: Completed \n");
                     }
 
                     else if(LED_Sel == 2)
                     {
-                      //LED_Sel = 3;
-                      Calibration = 0;
-                      //calibration_mode = sInitialize;
+                      LED_Sel = 3;
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+
+                      //Save all of the computed values
+                      DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
+                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
+                      GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
                       printf("LED 2 Calib ::: Completed \n");
 
                     }
@@ -1187,6 +1210,20 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       LED_Sel = 4;
                       Calibration = 0; // This will cancel the calirbation routine 
                       calibration_mode = sInitialize;
+      
+                      //Save all of the computed values
+                      DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
+                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED3_mask; 
+                      GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+      
+                      //Program the AFE with the individual values! 
+
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC1 | DAC2 | DAC3)); // 
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);                // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)             
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED1 | LED2 | LED3));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001);            // read mode
+
                       printf("LED 3 Calib ::: Completed \n");
                     }
                     break;

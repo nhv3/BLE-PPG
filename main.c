@@ -97,7 +97,7 @@ uint16_t prfcount=0;
 bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
 
-extern int Calibration;  // Global variable which is controlled by the library. Keep checking the status of the variable
+extern volatile int Calibration;  // Global variable which is controlled by the library. Keep checking the status of the variable
 extern long CTR;
 extern unsigned long AFE44xx_Current_Register_Settings[5];
 extern unsigned char HeartRate;
