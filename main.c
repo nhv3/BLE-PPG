@@ -102,6 +102,8 @@ extern long CTR;
 extern unsigned long AFE44xx_Current_Register_Settings[5];
 extern unsigned char HeartRate;
 
+int32_t txString[14];
+
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                             /**< Advertising module instance. */
@@ -425,7 +427,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   switch (p_ble_evt->header.evt_id) {
   case BLE_GAP_EVT_DISCONNECTED:
     NRF_LOG_INFO("Disconnected.");
-    printf("Device Disconnected ::: Disconnecting ::: Completed \n");
+   // printf("Device Disconnected ::: Disconnecting ::: Completed \n");
     app_timer_stop(m_sensor_char_timer_id);
     //Check if the timer expired which means we already turned the AFE off
     if (nrf_gpio_pin_out_read(RESETZ) == 1) 
@@ -441,7 +443,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
   case BLE_GAP_EVT_CONNECTED:
     NRF_LOG_INFO("Connected.");
-    printf("Device Connected ::: Completed \n");
+   // printf("Device Connected ::: Completed \n");
     err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
     APP_ERROR_CHECK(err_code);
 
@@ -492,7 +494,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   //interrupt handler, the softdevice context derails and we get a kernel failure. However, this helps us avoid poor context handling.
     case BLE_GATTS_EVT_HVN_TX_COMPLETE:
      if (issue_disconnect == 1) {
-     printf("Timer Expired! ::: Disconnecting ::: Completed \n");
+   //  printf("Timer Expired! ::: Disconnecting ::: Completed \n");
       err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
       APP_ERROR_CHECK(err_code);
       issue_disconnect = 0;
@@ -738,7 +740,7 @@ int main(void) {
   log_init();
   timers_init();
   power_management_init();
-  printf("STEP 1 ::: Initalizations ::: Completed\n");
+  //printf("STEP 1 ::: Initalizations ::: Completed\n");
 
   /*Initialize I2C interface - 400k baud*/
   I2C_init(BA_SDA_PIN, BA_SCL_PIN);
@@ -753,17 +755,17 @@ int main(void) {
   /*Program the AFE4404*/
   AFE4404_Init(); //Initilaizes all the ports needed perihperal to the AFE
 
-  printf("STEP 2 ::: PPG AFE Bring Up ::: Completed\n");
+  //printf("STEP 2 ::: PPG AFE Bring Up ::: Completed\n");
 
   AFE4404_ADCRDY_Interrupt_Enable();
   DAC_CALIBRATION_AUTOSTART();
-  LED_Sel = 1;
+  LED_Sel = 3;
   initCalibrationRoutine();
 
   //Power Down the AFE after the DAC-Calibration is completed
   AFE4404_Enable_HWPDN();
 
-  printf("STEP 3 ::: DAC Offset Calibrated ::: Completed\n");
+  //printf("STEP 3 ::: DAC Offset Calibrated ::: Completed\n");
 
   //Set up the BLE peripheral server with softdevice handler routines, begin advertising
   ble_stack_init();
@@ -775,7 +777,7 @@ int main(void) {
   peer_manager_init();
   advertising_start(erase_bonds);
 
-  printf("STEP 4 ::: BLE Setup  ::: Completed\n");
+  //printf("STEP 4 ::: BLE Setup  ::: Completed\n");
 
   nrf_delay_ms(20);
 
@@ -789,10 +791,10 @@ int main(void) {
       readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
 
       //Store reads locally into buffer
-      AFE_Buffer[0] = AFE4404_Reg_Read(42);
-      AFE_Buffer[1] = AFE4404_Reg_Read(44);
-      AFE_Buffer[2] = AFE4404_Reg_Read(43);
-      AFE_Buffer[3] = AFE4404_Reg_Read(45);
+      AFE_Buffer[0] = AFE4404_Reg_Read(42); //LED2
+      AFE_Buffer[1] = AFE4404_Reg_Read(44); //LED1
+      AFE_Buffer[2] = AFE4404_Reg_Read(43); //LED3
+      AFE_Buffer[3] = AFE4404_Reg_Read(45); //AMB1
 
       int32_t temperature = 0;
       int32_t Red = 0;
@@ -804,10 +806,10 @@ int main(void) {
       Green = (int32_t)(AFE_Buffer[1]); //Get green val reg
       Nir = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
 
-      sensor1_characteristic_update(&m_sensor_service, &temperature);
-      sensor2_characteristic_update(&m_sensor_service, &Green);
-      sensor3_characteristic_update(&m_sensor_service, &Red);
-      sensor4_characteristic_update(&m_sensor_service, &Nir);
+      //sensor1_characteristic_update(&m_sensor_service, &temperature);
+      //sensor2_characteristic_update(&m_sensor_service, &Green);
+      //sensor3_characteristic_update(&m_sensor_service, &Red);
+      //sensor4_characteristic_update(&m_sensor_service, &Nir);
 
       //We want Calibrate the system each time that we wake-up to start measuring values 
       if(Calibration == 1) //first time we enter the statement 
@@ -817,18 +819,27 @@ int main(void) {
           postCalib(AFE_Buffer[3]);
         }
       }
-    
+
       prfcount++;
-      if (prfcount == 10000) 
-      {
-          //g_OneSecondFlag = 1;
-          Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor 
-          prfcount = 0;
+      if (prfcount == 10000) {
+        //g_OneSecondFlag = 1;
+        Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
+        prfcount = 0;
+      }
+
+      //Now we want to read data out:
+      txString[0] = (int32_t)AFE4404_Reg_Read(42);
+      txString[1] = (int32_t)AFE4404_Reg_Read(44);
+      txString[2] = (int32_t)AFE4404_Reg_Read(43);
+      txString[3] = (int32_t)AFE4404_Reg_Read(45);
+
+      for (int i = 0; i <= 3; i++) {
+        printf("%d %d\n", i, txString[i]);
       }
 
       //Renable the device
       AFE4404_ADCRDY_Interrupt_Enable();
+    }
 
-    } //End of while change log
-  }
-} //End of file
+  } //End of while change log
+}

@@ -46,16 +46,16 @@ const unsigned long AMB23_mask = 0x0FFC1F;						// Mask for OFFDAC for LED2, LED
 const unsigned long AMB123_mask = 0xFFFFF;						// Mask for OFFDAC for LED1, LED2, LED3 and AMB1
 
 const unsigned long AMB1_mask_LED = 0x0003E0;					// Mask for OFFDAC for LED1 only (no AMB1)
-const unsigned long AMB2_mask_LED = 0x0F8000;					// Mask for OFFDAC for LED2 only (no AMB1)
+const unsigned long AMB2_mask_LED = 0x0F8000;	  				// Mask for OFFDAC for LED2 only (no AMB1)
 const unsigned long AMB3_mask_LED = 0x00001F;					// Mask for OFFDAC for LED3 only (no AMB1)
 const unsigned long AMB23_mask_LED = 0x0F801F;					// Mask for OFFDAC for LED2 and LED3 only (no AMB1)
 const unsigned long AMB123_mask_LED = 0x0F83FF;					// Mask for OFFDAC for LED1, LED2 and LED3 only (no AMB1)
 
-const unsigned int ILED_CURR_MIN_code = 2; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
-const unsigned int ILED_CURR_MAX_code = 55; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
+const unsigned int ILED_CURR_MIN_code = 1; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
+const unsigned int ILED_CURR_MAX_code = 10; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
 
 const short unsigned int LOW_THR_PERCENT = 10;       			// Low Threshold Percent
-const short unsigned int HIGH_THR_PERCENT = 90;      			// High Threshold percent
+const short unsigned int HIGH_THR_PERCENT = 70;      			// High Threshold percent
 const short unsigned int HYS_PERCENT = 3;            			// Hysteresis percent
 const short int TARGET_THR_PERCENT = 50;    					// Target Threshold percent
 
@@ -233,11 +233,11 @@ void setCfValue(int Cfvalue)
 *********************************************************************/
 void initCalibrationRoutine(void) 
 {   
-        AFE44xx_Current_Register_Settings[0] = 0;
-        AFE44xx_Current_Register_Settings[1] = 0;
-        AFE44xx_Current_Register_Settings[2] = 0;
-        AFE44xx_Current_Register_Settings[3] = 0;
-        AFE44xx_Current_Register_Settings[4] = 0;
+       // AFE44xx_Current_Register_Settings[0] = 0;
+       // AFE44xx_Current_Register_Settings[1] = 0;
+       // AFE44xx_Current_Register_Settings[2] = 0;
+       // AFE44xx_Current_Register_Settings[3] = 0;
+       // AFE44xx_Current_Register_Settings[4] = 0;
 
 	unsigned int Calibration_enabled = 0;
 	unsigned int Ipleth_num;
@@ -331,19 +331,19 @@ void initCalibrationRoutine(void)
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED2_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB2_mask));
-                        printf("LED 2\n");
+//                        printf("LED 2\n");
 		}
 		else if (LED_Sel == 3) 
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED3_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB3_mask));
-                         printf("LED 3\n");
+                        // printf("LED 3\n");
 		}
 		else //Default is LED1
 		{
 			AFE44xx_Current_Register_Settings[0] = (AFE44xx_Current_Register_Settings[0] & (~LED1_mask));	
 			AFE44xx_Current_Register_Settings[3] = (AFE44xx_Current_Register_Settings[3] & (~AMB1_mask));
-                         printf("LED 1\n");
+                        // printf("LED 1\n");
 		}
 
 		AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000); // write mode
@@ -640,7 +640,7 @@ switch (Gaincalibration_state)
 	// Mods to support selection of either LED1 or LED2 or LED3 in MODE1 (HRM only mode) - 03/24/2015
 	if (LED_Sel == 2) 
 	{
-                printf("LED 2 Initialize :::::::::: Completed \n");
+                //printf("LED 2 Initialize :::::::::: Completed \n");
 		// shifts the ILED code according to the current field corresponding to the LED number
 		LEDInterimCode = (ILED_CURR_MIN_code << LED2_reg_shift);
 		//updates the ILED register value
@@ -1153,7 +1153,7 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
 		case (sInitialize):
 		//calls the initCalibrationRoutine
 		initCalibrationRoutine();
-                printf("Calib Init ::: Completed \n");
+               // printf("Calib Init ::: Completed \n");
 		break;
     
 		case (sAmbientDAC):
@@ -1183,25 +1183,29 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       calibration_mode = sInitialize;
 
                       //Save all of the computed values
+                      //printf("%d \n",system.AMB_DAC);
+                      //printf("%d \n",system.AMB_DAC_AMB);
+                      //printf("%d \n",system.AMB_DAC_SIGN_LED);
+                      //printf("%d \n",system.AMB_DAC_SIGN_AMB);
                       DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask;
+                       printf("%X \n",DAC1);
                       LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
                       GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
 
-                      printf("LED 1 Calib ::: Completed \n");
+                     // printf("LED 1 Calib ::: Completed \n");
                     }
 
                     else if(LED_Sel == 2)
                     {
                       LED_Sel = 3;
-                      Calibration = 1;
+                      Calibration = 0;
                       calibration_mode = sInitialize;
-
-                      //Save all of the computed values
+                      //Save all of the computed values            
                       DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
                       LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
                       GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
 
-                      printf("LED 2 Calib ::: Completed \n");
+                    //  printf("LED 2 Calib ::: Completed \n");
 
                     }
 
@@ -1213,18 +1217,19 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
       
                       //Save all of the computed values
                       DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
-                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED3_mask; 
+                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL); 
                       GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
       
                       //Program the AFE with the individual values! 
+//                      printf("%X \n",(LED3));
+                     // printf("%X \n",(LED1 | LED2 | LED3));
+                     // AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode
+                      //AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC1 | DAC2 | DAC3)); // 
+                      //AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);                // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)             
+                      //AFE4404_Reg_Write(AFE_LEDCNTRL,(LED1 | LED2 | LED3));
+                      //AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001);            // read mode
 
-                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode
-                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC1 | DAC2 | DAC3)); // 
-                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);                // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)             
-                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED1 | LED2 | LED3));
-                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001);            // read mode
-
-                      printf("LED 3 Calib ::: Completed \n");
+                     // printf("LED 3 Calib ::: Completed \n");
                     }
                     break;
     
@@ -1589,8 +1594,8 @@ switch (OffsetDAC_code_Est_state)
     if (AMB_DAC_VALUE_AMB != 0)
     {
 		Meas_DC_OFFSET_DAC_code_step[AMB_DAC_VALUE_AMB] = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
+		//ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
+		//ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
     }
     AMB_DAC_VALUE_AMB++;
     if (AMB_DAC_VALUE_AMB == 16) //2

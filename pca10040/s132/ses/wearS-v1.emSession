@@ -69,8 +69,8 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="9" y="86" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.c" selected="0" top="73" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="737" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="715" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="45" y="57" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.c" selected="0" top="40" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="739" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="715" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="153" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../wearS_BLE_V1/AFE4404.c" selected="0" top="131" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="187" useTextEdit="1" useBinaryEdit="0" left="0" path="/Applications/SEGGER Embedded Studio for ARM 4.42/include/string.h" selected="0" top="160" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="352" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.h" selected="0" top="300" codecName="Default"/>
