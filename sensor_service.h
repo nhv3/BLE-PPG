@@ -30,6 +30,7 @@ typedef struct
     ble_gatts_char_handles_t char2_handles;
     ble_gatts_char_handles_t char3_handles;
     ble_gatts_char_handles_t char4_handles;
+    ble_gatts_char_handles_t char5_handles;
 }ble_os_t;
 
 /**@brief Function for handling BLE Stack events related to sensor service and characteristic.
@@ -55,8 +56,9 @@ void sensor_service_init(ble_os_t * p_sensor_service);
  * @param[in]   characteristic_value     New characteristic value.
  */
 void sensor1_characteristic_update(ble_os_t *p_sensor_service, int32_t *temp);
-void sensor2_characteristic_update(ble_os_t *p_sensor_service, int32_t *ch1);
-void sensor3_characteristic_update(ble_os_t *p_sensor_service, int32_t *ch2);
-void sensor4_characteristic_update(ble_os_t *p_sensor_service, int32_t *ch3);
+void sensor2_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch1);
+void sensor3_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch2);
+void sensor4_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch3);
+void sensor5_characteristic_update(ble_os_t *p_sensor_service, int32_t *ch4);
 
 #endif  /* _ SENSOR_SERVICE_H__ */

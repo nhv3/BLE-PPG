@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/AFE4404.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/AFE4404.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/AFE4404.h \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
@@ -54,7 +54,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/AFE4404.o: \
  ../../../../../../modules/nrfx/drivers/include/nrfx_gpiote.h \
  ../../../../../../modules/nrfx/hal/nrf_gpiote.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/I2C.h \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
  ../../../../../../components/boards/boards.h \
  ../../../../../../components/boards/pca10040.h \
  ../../../../../../components/libraries/util/app_error.h \

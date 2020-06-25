@@ -10,6 +10,7 @@
 #include "Calibration_AFE4404.h"
 #include "AFE4404.h"
 #include <stdio.h>
+#include "nrf_delay.h"
 
 
 /*******************************************************************************/
@@ -52,10 +53,10 @@ const unsigned long AMB23_mask_LED = 0x0F801F;					// Mask for OFFDAC for LED2 a
 const unsigned long AMB123_mask_LED = 0x0F83FF;					// Mask for OFFDAC for LED1, LED2 and LED3 only (no AMB1)
 
 const unsigned int ILED_CURR_MIN_code = 1; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
-const unsigned int ILED_CURR_MAX_code = 10; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
+const unsigned int ILED_CURR_MAX_code = 8; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
 
 const short unsigned int LOW_THR_PERCENT = 10;       			// Low Threshold Percent
-const short unsigned int HIGH_THR_PERCENT = 70;      			// High Threshold percent
+const short unsigned int HIGH_THR_PERCENT = 90;      			// High Threshold percent
 const short unsigned int HYS_PERCENT = 3;            			// Hysteresis percent
 const short int TARGET_THR_PERCENT = 50;    					// Target Threshold percent
 
@@ -112,6 +113,7 @@ RF_VALUES RFValue_Init_GainCal = s2M; 							// Initial Rf for Gain calibration 
 unsigned int periodic_cal_req = 0;
 unsigned long Ipleth = 1875;
 unsigned int LED_DC_can = 6;
+
 
 // Use this for 50mA range
 // int Ipleth_array[5] = { 1250, 1875, 2500, 3125, 3750 }; // codes for 1uA, 1.5uA ... 3uA expressed as 1000nA/0.8mA -- unit code is 0.8mA
@@ -233,11 +235,11 @@ void setCfValue(int Cfvalue)
 *********************************************************************/
 void initCalibrationRoutine(void) 
 {   
-       // AFE44xx_Current_Register_Settings[0] = 0;
-       // AFE44xx_Current_Register_Settings[1] = 0;
-       // AFE44xx_Current_Register_Settings[2] = 0;
-       // AFE44xx_Current_Register_Settings[3] = 0;
-       // AFE44xx_Current_Register_Settings[4] = 0;
+        AFE44xx_Current_Register_Settings[0] = 0;
+        AFE44xx_Current_Register_Settings[1] = 0;
+        AFE44xx_Current_Register_Settings[2] = 0;
+        AFE44xx_Current_Register_Settings[3] = 0;
+        AFE44xx_Current_Register_Settings[4] = 0;
 
 	unsigned int Calibration_enabled = 0;
 	unsigned int Ipleth_num;
@@ -348,7 +350,7 @@ void initCalibrationRoutine(void)
 
 		AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000); // write mode
 		AFE4404_Reg_Write(AFE_LEDCNTRL, AFE44xx_Current_Register_Settings[0]);    //0x20
-                //AFE4404_Reg_Write(AFE_TIAGAIN, AFE44xx_Current_Register_Settings[1]);
+                AFE4404_Reg_Write(AFE_TIAGAIN, AFE44xx_Current_Register_Settings[1]);
 		AFE4404_Reg_Write(AFE_TIAAMBGAIN, AFE44xx_Current_Register_Settings[2]);
 		AFE4404_Reg_Write(AFE_DAC_SETTING_REG, AFE44xx_Current_Register_Settings[3]);
 		AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); // read mode
@@ -1181,31 +1183,24 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       LED_Sel = 2;
                       Calibration = 1;
                       calibration_mode = sInitialize;
-
-                      //Save all of the computed values
-                      //printf("%d \n",system.AMB_DAC);
-                      //printf("%d \n",system.AMB_DAC_AMB);
-                      //printf("%d \n",system.AMB_DAC_SIGN_LED);
-                      //printf("%d \n",system.AMB_DAC_SIGN_AMB);
+      
                       DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask;
-                       printf("%X \n",DAC1);
                       LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
                       GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-
-                     // printf("LED 1 Calib ::: Completed \n");
+                      printf("%x\n",LED1);
+    
                     }
 
                     else if(LED_Sel == 2)
                     {
                       LED_Sel = 3;
-                      Calibration = 0;
+                      Calibration = 1;
                       calibration_mode = sInitialize;
+
                       //Save all of the computed values            
                       DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
                       LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
                       GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-
-                    //  printf("LED 2 Calib ::: Completed \n");
 
                     }
 
@@ -1219,17 +1214,14 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
                       LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL); 
                       GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-      
-                      //Program the AFE with the individual values! 
-//                      printf("%X \n",(LED3));
-                     // printf("%X \n",(LED1 | LED2 | LED3));
-                     // AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode
-                      //AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC1 | DAC2 | DAC3)); // 
-                      //AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);                // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)             
-                      //AFE4404_Reg_Write(AFE_LEDCNTRL,(LED1 | LED2 | LED3));
-                      //AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001);            // read mode
 
-                     // printf("LED 3 Calib ::: Completed \n");
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|DAC1|DAC3)); // 
+                      AFE4404_Reg_Write(AFE_TIAGAIN, GAIN2); //Enable Separate Gain  
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|LED1));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+
                     }
                     break;
     

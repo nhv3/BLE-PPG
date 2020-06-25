@@ -49,7 +49,7 @@
 /**********************************************************************************************************/
 /*                                              BEGIN GOLABAL DECLARATIONS                                */
 /**********************************************************************************************************/
-#define PPG_COLLECTION_TIME   40000
+#define PPG_COLLECTION_TIME   120000
 
 #define DEVICE_NAME                     "GUTSENS"                 /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "Stanford University"   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -58,14 +58,14 @@
 
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(100, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (0.1 seconds). */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(200, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
+#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(8, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (7 mseconds). */
+#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(9, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                   0                                       /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
 #define SENSOR_CHAR_TIMER_INTERVAL APP_TIMER_TICKS(PPG_COLLECTION_TIME)                          //1000 ms intervals
 
 
-#define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(5000)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
 #define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000)                  /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
 #define MAX_CONN_PARAMS_UPDATE_COUNT    3                                       /**< Number of attempts before giving up the connection parameter negotiation. */
 
@@ -79,8 +79,8 @@
 #define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-#define BA_SDA_PIN      26       // SDA signal pin for the current Arduino Breakout Board
-#define BA_SCL_PIN      27       // SCL signal pin for the current Arduino Breakout Board
+#define BA_SDA_PIN      27       // SDA signal pin for the current Arduino Breakout Board
+#define BA_SCL_PIN      26       // SCL signal pin for the current Arduino Breakout Board
 #define AMB_LED_1_VAL 0x2D // Register for the ambient value from phase 1 
 int RESETZ = 2;
 int ADC_RDY = 25;
@@ -90,10 +90,20 @@ volatile int g_OneSecondFlag=0;
 volatile int apptimerrunning = 0;
 volatile int issue_disconnect = 0;
 volatile int calibFinsihed = 0;
-char LED_Sel = 1;
-int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
-int prfcount = 0;
-uint16_t prfcount=0;
+char LED_Sel = 2;
+volatile int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
+volatile int prfcount = 0;
+volatile uint16_t prfcount=0;
+volatile int32_t ticks_now = 0;
+int32_t time_tick_update = 0;
+int32_t ramp1 = -2097152;
+int32_t ramp2= -2097152;
+int32_t ramp3 = -2097152;
+ble_gap_addr_t addres;
+
+volatile bool BLE_CONNECTED = false;
+int notifcation_count = 0;
+
 bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
 
@@ -103,6 +113,11 @@ extern unsigned long AFE44xx_Current_Register_Settings[5];
 extern unsigned char HeartRate;
 
 int32_t txString[14];
+int32_t Red[2] = {0,0};
+int32_t Green[2] = {0,0};
+int32_t Nir[2] = {0,0};
+int32_t test[5] = {0,0,0,0,0};
+
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -439,6 +454,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     apptimerrunning = 0;
     readDataFlag = 0;
     issue_disconnect = 0;
+    notifcation_count = 0;
     break;
 
   case BLE_GAP_EVT_CONNECTED:
@@ -489,6 +505,15 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
     APP_ERROR_CHECK(err_code);
     break;
+
+  case BLE_GATTS_EVT_WRITE:
+    notifcation_count = notifcation_count + 1;
+    if(notifcation_count==3)
+    {
+      nrf_delay_ms(50);
+    }
+  break;
+
 
   //This might seem odd, but we need to issue the disconnect after a CONN_PARAM_UPDATE has occured. For some reason if we issue the disconnect command in the timer
   //interrupt handler, the softdevice context derails and we get a kernel failure. However, this helps us avoid poor context handling.
@@ -661,8 +686,12 @@ double array_mean(int low, int high, uint16_t a[]) {
   return ((double)sum / (high - low));
 }
 
-void ADCRDY_HANDLER(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
-  readDataFlag = 1; //Set the readflag high to let us know that data has been captured on the ADC
+void ADCRDY_HANDLER(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) 
+{
+ // readDataFlag = 1; //Set the readflag high to let us know that data has been captured on the ADC
+   readDataFlag=1; //Set the readflag high to let us know that data has been captured on the ADC
+  //Grab the timer flag from the clock timer 
+  ticks_now = app_timer_cnt_get();
 }
 
 /**********************************************************************************************************/
@@ -676,15 +705,18 @@ void ADC_READY_GPIO_HANDLER_INIT(void) {
 
   /*Initialize the input pin to sense High to Low transition to grab the data after the ADC has dumped its value*/
   nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(true);
-
+  nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
   /*Set the pin input to Pulldown mode to keep the state defined when no driver present*/
   in_config.pull = NRF_GPIO_PIN_PULLDOWN;
+  out_config.init_state =  NRF_GPIOTE_INITIAL_VALUE_HIGH;
 
   /*Send Init config to GPIOTE handler*/
   err_code = nrf_drv_gpiote_in_init(ADC_RDY, &in_config, ADCRDY_HANDLER);
   APP_ERROR_CHECK(err_code);
+  err_code = nrf_drv_gpiote_out_init(17, &out_config);
+  APP_ERROR_CHECK(err_code);
+  
 }
-
 //Function for calibrating the DAC offset with PD disconnected. Runs once at start up and then ceases. Its for the inherient offset in the input.
 void DAC_CALIBRATION_AUTOSTART(void) {
 
@@ -701,21 +733,21 @@ void DAC_CALIBRATION_AUTOSTART(void) {
 }
 
 //Routine handler for calibrating each LED individually 
-void postCalib(unsigned long ambient)
+void postCalib(signed long ambient1, signed long ambient2)
 {
     switch(LED_Sel)
     {
 
       case 1:
-        CalibrateAFE4404(AFE_Buffer[0], ambient);
+        CalibrateAFE4404(AFE_Buffer[1], ambient1);
       break;
     
       case 2: 
-        CalibrateAFE4404(AFE_Buffer[1], ambient);
+        CalibrateAFE4404(AFE_Buffer[0], ambient1);
       break;
 
       case 3: 
-        CalibrateAFE4404(AFE_Buffer[2], ambient);
+        CalibrateAFE4404(AFE_Buffer[2], ambient1);
       break; 
 
       case 4: 
@@ -740,14 +772,14 @@ int main(void) {
   log_init();
   timers_init();
   power_management_init();
-  //printf("STEP 1 ::: Initalizations ::: Completed\n");
-
+  ADC_READY_GPIO_HANDLER_INIT();
+  printf("STEP 1 ::: Initalizations ::: Completed\n");
+  nrf_delay_ms(10);
   /*Initialize I2C interface - 400k baud*/
   I2C_init(BA_SDA_PIN, BA_SCL_PIN);
 
   /*Initialize AFE4404 */
   AFE4404_RESETZ_Init();         //Initialize the ACTIVE LOW input
-  ADC_READY_GPIO_HANDLER_INIT(); //Initialize the interrupt handler for the ADC_RDY Pin
   AFE4404_ADCRDY_Interrupt_Disable();
 
   AFE4404_Trigger_HWReset(); //Restart the device and reset HW config defaults
@@ -755,17 +787,18 @@ int main(void) {
   /*Program the AFE4404*/
   AFE4404_Init(); //Initilaizes all the ports needed perihperal to the AFE
 
-  //printf("STEP 2 ::: PPG AFE Bring Up ::: Completed\n");
+  printf("STEP 2 ::: PPG AFE Bring Up ::: Completed\n");
 
   AFE4404_ADCRDY_Interrupt_Enable();
   DAC_CALIBRATION_AUTOSTART();
-  LED_Sel = 3;
+  LED_Sel = 1;
   initCalibrationRoutine();
+  
 
   //Power Down the AFE after the DAC-Calibration is completed
   AFE4404_Enable_HWPDN();
 
-  //printf("STEP 3 ::: DAC Offset Calibrated ::: Completed\n");
+  printf("STEP 3 ::: DAC Offset Calibrated ::: Completed\n");
 
   //Set up the BLE peripheral server with softdevice handler routines, begin advertising
   ble_stack_init();
@@ -777,15 +810,13 @@ int main(void) {
   peer_manager_init();
   advertising_start(erase_bonds);
 
-  //printf("STEP 4 ::: BLE Setup  ::: Completed\n");
-
-  nrf_delay_ms(20);
+ printf("STEP 4 ::: BLE Setup  ::: Completed\n");
 
   /*ENTER WHILE LOOP*/
   while (1) {
 
     //If the app timer is running then we are in a valid connection and we are okay to collect data and send it out
-    if ((apptimerrunning == 1) && (readDataFlag == 1)) {
+    if ((apptimerrunning == 1) && (readDataFlag == 1) && (notifcation_count==3)) {
 
       AFE4404_ADCRDY_Interrupt_Disable();              //Stop the processing and go ahead with dumping the data in;
       readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
@@ -796,46 +827,42 @@ int main(void) {
       AFE_Buffer[2] = AFE4404_Reg_Read(43); //LED3
       AFE_Buffer[3] = AFE4404_Reg_Read(45); //AMB1
 
-      int32_t temperature = 0;
-      int32_t Red = 0;
-      int32_t Green = 0;
-      int32_t Nir = 0;
+      //Create new buffers to hold each piece of data with the timestamp
+      //Need 4 Bytes for the reading, and 4 bytes for the timestamp. This covers the entire 32 bit range. So each service will have 8 bytes being sent, for a total of 24 bytes for data
+      time_tick_update = ticks_now;
 
-      sd_temp_get(&temperature); //Get temperature
-      Red = (int32_t)(AFE_Buffer[0]); //Get red val reg
-      Green = (int32_t)(AFE_Buffer[1]); //Get green val reg
-      Nir = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
+      test[0] = (int32_t)(AFE_Buffer[0]); //Get red val reg
+      test[1] = (int32_t)(AFE_Buffer[1]); //Get green val reg
+      test[2] = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
+      test[3] = (int32_t)(AFE_Buffer[3]); //Get AMB1 val reg
+      test[4] = time_tick_update;
 
-      //sensor1_characteristic_update(&m_sensor_service, &temperature);
-      //sensor2_characteristic_update(&m_sensor_service, &Green);
-      //sensor3_characteristic_update(&m_sensor_service, &Red);
-      //sensor4_characteristic_update(&m_sensor_service, &Nir);
+      //Use memcpy to get the correct blocks from the data to then send on over to the sensor update function
+      uint8_t test_nibble[20];
+
+      memcpy(test_nibble, &test, sizeof(test));
+
+      sensor2_characteristic_update(&m_sensor_service, test_nibble);
 
       //We want Calibrate the system each time that we wake-up to start measuring values 
       if(Calibration == 1) //first time we enter the statement 
       {
         if(CALIBRATION_ENABLED == true)
         {
-          postCalib(AFE_Buffer[3]);
+          postCalib(AFE_Buffer[3], AFE_Buffer[2]);
         }
       }
 
-      prfcount++;
-      if (prfcount == 10000) {
-        //g_OneSecondFlag = 1;
-        Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
-        prfcount = 0;
-      }
+      //prfcount++;
+      //if (prfcount == 100000) {
+       // g_OneSecondFlag = 1;
+       // Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
+       // prfcount = 0;
+      //}
 
-      //Now we want to read data out:
-      txString[0] = (int32_t)AFE4404_Reg_Read(42);
-      txString[1] = (int32_t)AFE4404_Reg_Read(44);
-      txString[2] = (int32_t)AFE4404_Reg_Read(43);
-      txString[3] = (int32_t)AFE4404_Reg_Read(45);
-
-      for (int i = 0; i <= 3; i++) {
-        printf("%d %d\n", i, txString[i]);
-      }
+      //for (int i = 0; i <= 4; i++) {
+      //  printf("%d %d\n", i, txString[i]);
+     // }
 
       //Renable the device
       AFE4404_ADCRDY_Interrupt_Enable();

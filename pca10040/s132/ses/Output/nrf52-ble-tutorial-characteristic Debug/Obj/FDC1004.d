@@ -1,7 +1,7 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/FDC1004.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/FDC1004.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/FDC1004.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/wearS-v1-2019-08-15-multi-oects-demo/I2C.h \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/FDC1004.c \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/FDC1004.h \
+ /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  ../../../../../../components/boards/boards.h \

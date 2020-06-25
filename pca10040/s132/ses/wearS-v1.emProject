@@ -167,7 +167,8 @@
     <configuration
       Name="Debug"
       c_preprocessor_definitions="CONFIG_NFCT_PINS_AS_GPIOS"
-      c_user_include_directories="." />
+      c_user_include_directories="."
+      debug_terminal_log_file="/Nordic/test.txt" />
   </project>
   <configuration
     Name="Release"
