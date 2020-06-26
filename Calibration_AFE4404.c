@@ -53,9 +53,9 @@ const unsigned long AMB23_mask_LED = 0x0F801F;					// Mask for OFFDAC for LED2 a
 const unsigned long AMB123_mask_LED = 0x0F83FF;					// Mask for OFFDAC for LED1, LED2 and LED3 only (no AMB1)
 
 const unsigned int ILED_CURR_MIN_code = 1; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
-const unsigned int ILED_CURR_MAX_code = 8; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
+const unsigned int ILED_CURR_MAX_code = 10; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
 
-const short unsigned int LOW_THR_PERCENT = 10;       			// Low Threshold Percent
+const short unsigned int LOW_THR_PERCENT = 30;       			// Low Threshold Percent
 const short unsigned int HIGH_THR_PERCENT = 90;      			// High Threshold percent
 const short unsigned int HYS_PERCENT = 3;            			// Hysteresis percent
 const short int TARGET_THR_PERCENT = 50;    					// Target Threshold percent
@@ -1187,8 +1187,6 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask;
                       LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
                       GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-                      printf("%x\n",LED1);
-    
                     }
 
                     else if(LED_Sel == 2)

@@ -205,7 +205,7 @@ static uint32_t sensor_char3_add(ble_os_t * p_sensor_service)
 		attr_char_value.p_attr_md   = &attr_md;
     
     // SENSOR_JOB: Step 2.H, Set characteristic length in number of bytes
-		attr_char_value.max_len     = 8;
+		attr_char_value.max_len     = 2;
 		attr_char_value.init_len    = 2;
 		uint8_t value[2]            = {0x00,0x00};
 		attr_char_value.p_value     = value;

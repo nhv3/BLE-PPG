@@ -54,7 +54,7 @@
 #define DEVICE_NAME                     "GUTSENS"                 /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "Stanford University"   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                160                     /**< The advertising interval (in units of 0.625 ms (16 kHz). This value corresponds to 187.5 ms). */
-#define APP_ADV_DURATION                18000                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define APP_ADV_DURATION                0                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 
 #define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
@@ -116,7 +116,7 @@ int32_t txString[14];
 int32_t Red[2] = {0,0};
 int32_t Green[2] = {0,0};
 int32_t Nir[2] = {0,0};
-int32_t test[5] = {0,0,0,0,0};
+int32_t test[6] = {0,0,0,0,0,0};
 
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
@@ -438,6 +438,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
  */
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   ret_code_t err_code = NRF_SUCCESS;
+  ble_gatts_evt_write_t * write_evt;
 
   switch (p_ble_evt->header.evt_id) {
   case BLE_GAP_EVT_DISCONNECTED:
@@ -507,11 +508,37 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     break;
 
   case BLE_GATTS_EVT_WRITE:
+  //Sensor1 = 16
+  //Sensor2 = 19
+  //Sensor3 = 22
+  //Sensor4 = 25
+
+    write_evt = &p_ble_evt->evt.gatts_evt.params.write;
+    uint16_t handle = write_evt->handle;
+
     notifcation_count = notifcation_count + 1;
     if(notifcation_count==3)
     {
       nrf_delay_ms(50);
     }
+    
+    //Test handle for evothings app
+    if(handle == 22)
+    {
+      uint8_t testStore;
+      ble_gatts_value_t testStruct;
+
+
+      testStruct.p_value = &testStore;
+      testStruct.len = 4;
+      testStruct.offset = 0;
+
+      sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, 22, &testStruct);
+      uint8_t inte = 1;
+      printf("%d", *testStruct.p_value);
+    }
+    
+
   break;
 
 
@@ -836,9 +863,10 @@ int main(void) {
       test[2] = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
       test[3] = (int32_t)(AFE_Buffer[3]); //Get AMB1 val reg
       test[4] = time_tick_update;
+      test[5] = 0;
 
       //Use memcpy to get the correct blocks from the data to then send on over to the sensor update function
-      uint8_t test_nibble[20];
+      uint8_t test_nibble[24];
 
       memcpy(test_nibble, &test, sizeof(test));
 
