@@ -102,7 +102,7 @@ int32_t ramp3 = -2097152;
 ble_gap_addr_t addres;
 
 volatile bool BLE_CONNECTED = false;
-int notifcation_count = 0;
+volatile bool streaming = false;
 
 bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
@@ -117,6 +117,10 @@ int32_t Red[2] = {0,0};
 int32_t Green[2] = {0,0};
 int32_t Nir[2] = {0,0};
 int32_t test[6] = {0,0,0,0,0,0};
+uint32_t programming_data = 0;
+
+uint16_t stream_service;
+uint16_t  prog_service;
 
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
@@ -455,7 +459,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     apptimerrunning = 0;
     readDataFlag = 0;
     issue_disconnect = 0;
-    notifcation_count = 0;
+   streaming = false;
     break;
 
   case BLE_GAP_EVT_CONNECTED:
@@ -516,14 +520,14 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     write_evt = &p_ble_evt->evt.gatts_evt.params.write;
     uint16_t handle = write_evt->handle;
 
-    notifcation_count = notifcation_count + 1;
-    if(notifcation_count==3)
+    //Handle the case where we want to stream out data
+    if(handle == stream_service)
     {
-      nrf_delay_ms(50);
+     streaming = true;
     }
-    
-    //Test handle for evothings app
-    if(handle == 22)
+
+    //Handle the case where we get data written to programming package
+    if(handle == prog_service)
     {
       uint8_t testStore;
       ble_gatts_value_t testStruct;
@@ -534,8 +538,8 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
       testStruct.offset = 0;
 
       sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, 22, &testStruct);
-      uint8_t inte = 1;
-      printf("%d", *testStruct.p_value);
+     
+
     }
     
 
@@ -843,7 +847,7 @@ int main(void) {
   while (1) {
 
     //If the app timer is running then we are in a valid connection and we are okay to collect data and send it out
-    if ((apptimerrunning == 1) && (readDataFlag == 1) && (notifcation_count==3)) {
+    if ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)) {
 
       AFE4404_ADCRDY_Interrupt_Disable();              //Stop the processing and go ahead with dumping the data in;
       readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
