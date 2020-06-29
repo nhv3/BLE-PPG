@@ -129,6 +129,8 @@
       <configuration Name="Release" build_exclude_from_build="No" />
       <file file_name="../../../Calibration_AFE4404.h" />
       <file file_name="../../../Calibration_AFE4404.c" />
+      <file file_name="AFE_programmer.c" />
+      <file file_name="AFE_programmer.h" />
     </folder>
     <folder Name="nRF_Segger_RTT">
       <file file_name="../../../../../../external/segger_rtt/SEGGER_RTT.c" />

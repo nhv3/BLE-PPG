@@ -1219,7 +1219,6 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
                       AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
                       AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|LED1));
                       AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
-
                     }
                     break;
     

@@ -103,6 +103,7 @@ ble_gap_addr_t addres;
 
 volatile bool BLE_CONNECTED = false;
 volatile bool streaming = false;
+volatile bool programming = false; 
 
 bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
@@ -122,6 +123,7 @@ uint32_t programming_data = 0;
 uint16_t stream_service;
 uint16_t  prog_service;
 
+uint8_t LED_phase = 0x00; //holds the LED phase
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -442,7 +444,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
  */
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   ret_code_t err_code = NRF_SUCCESS;
-  ble_gatts_evt_write_t * write_evt;
+  ble_gatts_evt_write_t const * write_evt;
 
   switch (p_ble_evt->header.evt_id) {
   case BLE_GAP_EVT_DISCONNECTED:
@@ -526,23 +528,24 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
      streaming = true;
     }
 
-    //Handle the case where we get data written to programming package
-    if(handle == prog_service)
+    else if (handle == prog_service)
     {
-      uint8_t testStore;
-      ble_gatts_value_t testStruct;
+        //Setup an allocated chunk in memory to read out the data from the gatt server.
+        uint8_t prog_data[10] = {0xCC,0xCC};
+        ble_gatts_value_t  	temp;
+        temp.p_value   = prog_data;
+        temp.len      = 10;
+        temp.offset   = 0;
 
+        sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, prog_service, &temp); //Read the prog_service write event 
+        
+        LED_phase = prog_data[0];
 
-      testStruct.p_value = &testStore;
-      testStruct.len = 4;
-      testStruct.offset = 0;
-
-      sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, 22, &testStruct);
-     
+        programming = true; 
 
     }
-    
 
+    
   break;
 
 
@@ -764,33 +767,134 @@ void DAC_CALIBRATION_AUTOSTART(void) {
 }
 
 //Routine handler for calibrating each LED individually 
-void postCalib(signed long ambient1, signed long ambient2)
+void postCalib(signed long ambient1, signed long ambient2,LED_phase)
 {
-    switch(LED_Sel)
-    {
+        switch LED_phase 
+        {
+          case 0x01: //NIR phase only
+          break;
 
-      case 1:
-        CalibrateAFE4404(AFE_Buffer[1], ambient1);
-      break;
+          case 0x02: //green phase only
+          break;
+
+          case 0x03: //green and nir phase
+          break;
+
+          case 0x04: //red ohase only
+          break;
+
+          case 0x05: //red and nir phase
+          break;
+
+          case 0x06: //red-green phase
+          break;
+
+          case 0x07: //all phases enabled
+          three_phase_calib(ambient1);
+          break;
+        }
+          
+}
+
+
+void three_phase_calib(signed long ambient1)
+{
+          switch(LED_Sel)
+          {
+
+            case 1:
+              CalibrateAFE4404(AFE_Buffer[1], ambient1);
+            break;
     
-      case 2: 
-        CalibrateAFE4404(AFE_Buffer[0], ambient1);
-      break;
+            case 2: 
+              CalibrateAFE4404(AFE_Buffer[0], ambient1);
+            break;
 
-      case 3: 
-        CalibrateAFE4404(AFE_Buffer[2], ambient1);
-      break; 
+            case 3: 
+              CalibrateAFE4404(AFE_Buffer[2], ambient1);
+            break; 
 
-      case 4: 
-        LED_Sel = 1;
-        Calibration = 0;
-      break; 
+            case 4: 
+              LED_Sel = 1;
+              Calibration = 0;
+            break; 
 
-      default: 
-      break;
+            default: 
+            break;
     
-    }
+          }
+}
+
+void two_phase_calib_RG(signed long ambient1,signed long ambient2)
+{
+          switch(LED_Sel)
+          {
+
+            case 1: //Green
+              CalibrateAFE4404(AFE_Buffer[1], ambient1);
+            break;
     
+            case 2: //Red
+              CalibrateAFE4404(AFE_Buffer[0], ambient2);
+            break;
+
+            case 4: 
+              LED_Sel = 1;
+              Calibration = 0;
+            break; 
+
+            default: 
+            break;
+    
+          }
+}
+
+void two_phase_calib_RN(signed long ambient1,signed long ambient2)
+{
+          switch(LED_Sel)
+          {
+            case 2: 
+              CalibrateAFE4404(AFE_Buffer[0], ambient1);
+            break;
+
+            case 3: 
+              CalibrateAFE4404(AFE_Buffer[2], ambient1);
+            break; 
+
+            case 4: 
+              LED_Sel = 1;
+              Calibration = 0;
+            break; 
+
+            default: 
+            break;
+    
+          }
+}
+
+
+void two_phase_calib_GN(signed long ambient1,signed long ambient2)
+{
+          switch(LED_Sel)
+          {
+
+            case 1:
+              CalibrateAFE4404(AFE_Buffer[1], ambient1);
+            break;
+
+            case 3: 
+              CalibrateAFE4404(AFE_Buffer[2], ambient1);
+            break; 
+
+            case 4: 
+              LED_Sel = 1;
+              Calibration = 0;
+            break; 
+
+            default: 
+            break;
+    
+          }
 }
 
 /**********************************************************************************************************/
@@ -846,8 +950,12 @@ int main(void) {
   /*ENTER WHILE LOOP*/
   while (1) {
 
+    bool streaming_select = ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)); //This will be true when we want to stream data to the phone. 
+    bool progamming_select = ((apptimerrunning == 1) && (programminging)); //This will be true when we only want to programm the device.
+
     //If the app timer is running then we are in a valid connection and we are okay to collect data and send it out
-    if ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)) {
+    if (streaming_select)
+     {
 
       AFE4404_ADCRDY_Interrupt_Disable();              //Stop the processing and go ahead with dumping the data in;
       readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
@@ -891,13 +999,15 @@ int main(void) {
        // Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
        // prfcount = 0;
       //}
-
-      //for (int i = 0; i <= 4; i++) {
-      //  printf("%d %d\n", i, txString[i]);
-     // }
-
-      //Renable the device
       AFE4404_ADCRDY_Interrupt_Enable();
+    }
+
+    //If programming is selected, program the AFE here 
+    else if (programming_select)
+    {
+        update_AFE(LED_phase);
+
+
     }
 
   } //End of while change log
