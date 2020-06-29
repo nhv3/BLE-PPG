@@ -92,7 +92,7 @@ void update_AFE(uint8_t LED_phase)
                   AFE4404_Reg_Write(49, 0x20); //CONTROL3
                   AFE4404_Reg_Write(50, 0x1563); //PDNCYCLESTC
                   AFE4404_Reg_Write(51, 0x991F); //PDNCYCLEENDC
-                  AFE4404_Reg_Write(52, 0x0); //PROG_TG_ST
+                  AFE4404_Reg_Write(52, 0x0); //PROG_TG_STC
                   AFE4404_Reg_Write(53, 0x0); //PROG_TG_ENDC
                   AFE4404_Reg_Write(54, 0x0); //LED3LEDSTC
                   AFE4404_Reg_Write(55, 0x0); //LED3LEDENDC
