@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/sensor_service.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.c \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/string.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
@@ -49,7 +49,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/sensor_service.o: \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s132/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \
  ../../../../../../components/softdevice/s132/headers/ble_err.h \
  ../../../../../../components/softdevice/s132/headers/ble_gap.h \

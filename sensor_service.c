@@ -377,7 +377,7 @@ void sensor_service_init(ble_os_t * p_sensor_service)
 
 
     //Set up handle capture 
-    stream_service = p_sensor_service->char2_handles.value_handle;
+    stream_service = p_sensor_service->char2_handles.cccd_handle;
     prog_service = p_sensor_service->char3_handles.value_handle;
 
 }

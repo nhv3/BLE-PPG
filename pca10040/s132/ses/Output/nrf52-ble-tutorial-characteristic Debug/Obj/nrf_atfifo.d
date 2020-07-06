@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_atfifo.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo.c \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/string.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
@@ -20,7 +20,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_atfifo.o: \
  ../../../../../../modules/nrfx/mdk/nrf51_to_nrf52.h \
  ../../../../../../modules/nrfx/mdk/nrf52_name_change.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo.h \
  ../config/sdk_config.h \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
@@ -29,7 +29,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_atfifo.o: \
  ../../../../../../components/libraries/experimental_log/nrf_log_instance.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_types.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo_internal.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_fifo/nrf_atfifo_internal.h \
  ../../../../../../components/libraries/experimental_log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \
  ../../../../../../components/libraries/util/sdk_os.h \

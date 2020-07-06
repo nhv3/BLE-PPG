@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/ADC.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/ADC.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/ADC.c \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \

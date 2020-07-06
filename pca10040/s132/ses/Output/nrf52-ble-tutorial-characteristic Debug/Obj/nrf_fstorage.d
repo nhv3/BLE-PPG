@@ -1,7 +1,7 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_fstorage.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.c \
  ../config/sdk_config.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../components/libraries/util/sdk_errors.h \

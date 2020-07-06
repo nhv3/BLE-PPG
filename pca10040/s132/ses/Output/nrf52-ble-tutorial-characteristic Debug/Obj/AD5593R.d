@@ -1,8 +1,8 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/AD5593R.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AD5593R.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AD5593R.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AD5593R.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AD5593R.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  ../../../../../../components/boards/boards.h \

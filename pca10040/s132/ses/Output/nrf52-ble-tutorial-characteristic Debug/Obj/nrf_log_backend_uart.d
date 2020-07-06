@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_log_backend_uart.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_uart.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_uart.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \

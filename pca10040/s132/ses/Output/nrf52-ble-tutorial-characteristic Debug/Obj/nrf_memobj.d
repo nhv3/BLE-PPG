@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_memobj.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_memobj/nrf_memobj.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_memobj/nrf_memobj.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_memobj/nrf_memobj.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_memobj/nrf_memobj.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdlib.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \

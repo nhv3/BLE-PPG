@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/security_dispatcher.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/security_dispatcher.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/security_dispatcher.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,7 +27,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/security_dispatcher.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/security_dispatcher.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/security_dispatcher.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \
  ../../../../../../components/softdevice/s132/headers/nrf_svc.h \
@@ -42,7 +42,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/security_dispatcher.o: \
  ../../../../../../components/softdevice/s132/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s132/headers/ble_gatts.h \
  ../../../../../../components/softdevice/s132/headers/ble_gap.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_manager_types.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_manager_types.h \
  ../../../../../../components/softdevice/s132/headers/ble_hci.h \
  ../../../../../../components/ble/common/ble_gatt_db.h \
  ../../../../../../components/softdevice/s132/headers/ble_gattc.h \
@@ -57,6 +57,6 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/security_dispatcher.o: \
  ../../../../../../components/softdevice/s132/headers/ble_err.h \
  ../../../../../../components/ble/common/ble_conn_state.h \
  ../../../../../../components/libraries/atomic/nrf_atomic.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_database.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_manager_internal.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/id_manager.h
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_database.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/peer_manager_internal.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/id_manager.h

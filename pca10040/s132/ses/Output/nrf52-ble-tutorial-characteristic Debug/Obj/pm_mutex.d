@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/pm_mutex.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/pm_mutex.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/pm_mutex.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,7 +27,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/pm_mutex.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/pm_mutex.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/peer_manager/pm_mutex.h \
  ../../../../../../components/libraries/util/app_util_platform.h \
  ../../../../../../components/softdevice/s132/headers/nrf_soc.h \
  ../../../../../../components/softdevice/s132/headers/nrf_svc.h \

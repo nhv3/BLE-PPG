@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/bsp_btn_ble.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_btn_ble.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_btn_ble.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_btn_ble.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_btn_ble.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \
  ../../../../../../components/softdevice/s132/headers/nrf_svc.h \
@@ -26,7 +26,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/bsp_btn_ble.o: \
  ../../../../../../modules/nrfx/mdk/nrf52_name_change.h \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/softdevice/s132/headers/ble_gatts.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../components/boards/boards.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \

@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/app_scheduler.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/scheduler/app_scheduler.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/scheduler/app_scheduler.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,7 +27,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/app_scheduler.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/scheduler/app_scheduler.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/scheduler/app_scheduler.h \
  ../../../../../../components/libraries/util/app_error.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  ../../../../../../components/libraries/util/app_error_weak.h \

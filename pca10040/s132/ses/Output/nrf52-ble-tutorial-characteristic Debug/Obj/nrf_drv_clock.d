@@ -1,7 +1,7 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_clock.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_clock.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_clock.c \
  ../../../../../../components/libraries/util/nordic_common.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_clock.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_clock.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_clock.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \

@@ -7,6 +7,7 @@
  * ALL RIGHTS RESERVED  
  *
 */
+#include "stdint.h"
 
 #ifndef _CALIBRATION_AFE4404_H_
 #define _CALIBRATION_AFE4404_H_
@@ -120,7 +121,8 @@ static long Meas_DC_OFFSET_DAC_code_step[16];
 /*******************************************************************************/
 void initCalibrationRoutine(void);
 void AmbientCancellation(long,long);
-void CalibrateAFE4404(long,long);
+void CalibrateAFE4404(long,long, long);
+void LED_phase_manager(long);
 void GainCalibration(long,long);
 void PeriodicCalibration(long,long);
 void gaincalibrate(long, unsigned int);

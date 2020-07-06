@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrfx_twi.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/nrfx_twi.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/nrfx_twi.c \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \

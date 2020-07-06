@@ -11,6 +11,7 @@
 #include "AFE4404.h"
 #include <stdio.h>
 #include "nrf_delay.h"
+#include "stdint.h"
 
 
 /*******************************************************************************/
@@ -1138,6 +1139,194 @@ switch (Gaincalibration_state)
   }
 }
 
+
+//Function to manage the LED phase in calibration
+void LED_phase_manager(long LED_phase)
+{
+    switch (LED_phase) 
+        {
+          case 0x01: //NIR phase only
+               LED_Sel = 3; //Keep LED select value
+               Calibration = 0; // This will cancel the calirbation routine 
+               calibration_mode = sInitialize;
+               //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
+          break;
+
+          case 0x02: //green phase only
+               LED_Sel = 1; //Keep LED select value
+               Calibration = 0; // This will cancel the calirbation routine 
+               calibration_mode = sInitialize;
+               //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
+          break;
+
+          case 0x03: //green and nir phase
+                if(LED_Sel == 1) //First we want to program the green phase 
+                    {
+                      LED_Sel = 3; //move onto the nir led
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+      
+                      DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask_LED;
+                      LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
+                      GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+                    }
+
+                else if (LED_Sel == 3)
+                    {
+                      LED_Sel = 1; //Move back to the green LED for the next time calibration is called
+                      Calibration = 0; // This will cancel the calirbation routine 
+                      calibration_mode = sInitialize;
+      
+                      //Save all of the computed values
+                      DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
+                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL); 
+                      GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (0x00|DAC1|DAC3)); // 
+                      AFE4404_Reg_Write(AFE_TIAGAIN, 0x8000|GAIN3); //Enable Separate Gain  
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|0x00|LED1));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                    }
+          break;
+
+          case 0x04: //red ohase only
+               LED_Sel = 2; //Keep LED select value
+               Calibration = 0; // This will cancel the calirbation routine 
+               calibration_mode = sInitialize;
+               //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
+
+          break;
+
+          case 0x05: //red and nir phase
+                 if(LED_Sel == 2)
+                    {
+                      LED_Sel = 3; //Move onto LED3, NIR
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+
+                      //Save all of the computed values            
+                      DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
+                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
+                      GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                    }
+
+                    else if (LED_Sel == 3)
+                    {
+                      LED_Sel = 2; //Move back to Red LED
+                      Calibration = 0; // This will cancel the calirbation routine 
+                      calibration_mode = sInitialize;
+      
+                      //Save all of the computed values
+                      DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
+                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL); 
+                      GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|0x00|DAC3)); //   
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN2);              // TIA gain = gain from LED 2 phase (will incorporate more complex scheme later)       
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|0x00));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                    }
+
+
+
+          break;
+
+          case 0x06: //red-green phase
+           if(LED_Sel == 1) //First we want to program the green phase 
+                    {
+                      LED_Sel = 2; //move onto the nir led
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+      
+                      DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask_LED;
+                      LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
+                      GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+                    }
+
+           else if (LED_Sel == 2)
+                    {
+                      LED_Sel = 1; //Move back to the green led 
+                      Calibration = 0;
+                      calibration_mode = sInitialize;
+
+                      //Save all of the computed values            
+                      DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
+                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
+                      GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|DAC1|0x00)); // 
+                      AFE4404_Reg_Write(AFE_TIAGAIN,0x8000|GAIN2); //Enable Separate Gain  
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(0x00));
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED2|LED1));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+
+                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL);
+                      printf("%X",LED2);
+                    }
+
+          break;
+
+          case 0x07: //all phases enabled
+                    if(LED_Sel == 1)
+                    {
+                    //printf("LED1::: Completed \n");
+                      LED_Sel = 2;
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+      
+                      DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask_LED;
+                      LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
+                      GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+                    }
+
+                    else if(LED_Sel == 2)
+                    {
+                    //printf("LED2::: Completed \n");
+                      LED_Sel = 3;
+                      Calibration = 1;
+                      calibration_mode = sInitialize;
+
+                      //Save all of the computed values            
+                      DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
+                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
+                      GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                    }
+
+                    else
+                    {
+                    //printf("LED3::: Completed \n");
+                      LED_Sel = 1;
+                      Calibration = 0; // This will cancel the calirbation routine 
+                      calibration_mode = sInitialize;
+      
+                      //Save all of the computed values
+                      DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
+                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED3_mask; 
+                      GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
+
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
+                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|DAC1|DAC3)); // 
+                      AFE4404_Reg_Write(AFE_TIAGAIN,GAIN2); //Enable Separate Gain  
+                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
+                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|LED1));
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                    }
+
+          break;
+
+          default:
+          break;
+        }
+
+}
+
 /*********************************************************************
 * @fn      	CalibrateAFE4404
 *
@@ -1148,7 +1337,7 @@ switch (Gaincalibration_state)
 * @return  	void
 *
 *********************************************************************/
-void CalibrateAFE4404(long LEDVALUE, long AMBVALUE) 
+void CalibrateAFE4404(long LEDVALUE, long AMBVALUE, long LED_phase) 
 {
 	switch (calibration_mode) 
 	{
@@ -1177,55 +1366,15 @@ void CalibrateAFE4404(long LEDVALUE, long AMBVALUE)
     
                 //We will modify the calibiration method to calibrate all three LEDS based on ambient values captured. The first LED to start is 1 -> 3
 		case (sFinish):
-
-                    if(LED_Sel == 1)
-                    {
-                      LED_Sel = 2;
-                      Calibration = 1;
-                      calibration_mode = sInitialize;
-      
-                      DAC1 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB1_mask;
-                      LED1 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED1_mask; 
-                      GAIN1 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-                    }
-
-                    else if(LED_Sel == 2)
-                    {
-                      LED_Sel = 3;
-                      Calibration = 1;
-                      calibration_mode = sInitialize;
-
-                      //Save all of the computed values            
-                      DAC2 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB2_mask_LED;
-                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL) & LED2_mask; 
-                      GAIN2 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-
-                    }
-
-                    else
-                    {
-                      LED_Sel = 4;
-                      Calibration = 0; // This will cancel the calirbation routine 
-                      calibration_mode = sInitialize;
-      
-                      //Save all of the computed values
-                      DAC3 =  AFE4404_Reg_Read(AFE_DAC_SETTING_REG) & AMB3_mask_LED;
-                      LED3 = AFE4404_Reg_Read(AFE_LEDCNTRL); 
-                      GAIN3 = AFE4404_Reg_Read(AFE_TIAAMBGAIN);
-
-                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
-                      AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|DAC1|DAC3)); // 
-                      AFE4404_Reg_Write(AFE_TIAGAIN, GAIN2); //Enable Separate Gain  
-                      AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
-                      AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|LED1));
-                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
-                    }
-                    break;
+                    LED_phase_manager(LED_phase);
+                break;
     
 		default:
 		break;
 	}
 }
+
+
 
 
 /*********************************************************************
@@ -1583,8 +1732,8 @@ switch (OffsetDAC_code_Est_state)
     if (AMB_DAC_VALUE_AMB != 0)
     {
 		Meas_DC_OFFSET_DAC_code_step[AMB_DAC_VALUE_AMB] = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		//ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
-		//ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
+		ADC_CODE_AMB_DAC_STEP = Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB] - Meas_DC_OFFSET_DAC_code[AMB_DAC_VALUE_AMB-1];
+		ADC_CODE_AMB_DAC_MIN = ADC_CODE_AMB_DAC_STEP >> 1;
     }
     AMB_DAC_VALUE_AMB++;
     if (AMB_DAC_VALUE_AMB == 16) //2

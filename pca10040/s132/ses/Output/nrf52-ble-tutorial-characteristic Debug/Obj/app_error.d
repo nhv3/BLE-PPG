@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/app_error.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error.c \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -15,9 +15,9 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/app_error.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/sdk_errors.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s132/headers/nrf_error.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/nordic_common.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error_weak.h
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/nordic_common.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/util/app_error_weak.h

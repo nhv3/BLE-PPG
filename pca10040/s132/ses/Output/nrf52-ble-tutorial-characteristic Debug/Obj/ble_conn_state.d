@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/ble_conn_state.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_conn_state.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_conn_state.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_conn_state.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_conn_state.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \

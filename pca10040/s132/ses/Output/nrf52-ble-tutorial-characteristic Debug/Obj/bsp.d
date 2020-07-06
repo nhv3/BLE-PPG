@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/bsp.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../components/boards/boards.h \
@@ -53,5 +53,5 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/bsp.o: \
  ../../../../../../components/boards/pca10040.h \
  ../../../../../../components/libraries/button/app_button.h \
  ../../../../../../components/libraries/util/app_error.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_config.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/bsp/bsp_config.h \
  ../../../../../../components/libraries/timer/app_timer.h

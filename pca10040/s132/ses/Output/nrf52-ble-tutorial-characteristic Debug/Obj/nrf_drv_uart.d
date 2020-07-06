@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_uart.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_uart.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_uart.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_uart.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_uart.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \

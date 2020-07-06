@@ -1,7 +1,7 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/SEGGER_RTT.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT_Conf.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/segger_rtt/SEGGER_RTT_Conf.h \
  ../../../../../../components/libraries/util/nordic_common.h \
  ../../../../../../components/libraries/util/app_util_platform.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \

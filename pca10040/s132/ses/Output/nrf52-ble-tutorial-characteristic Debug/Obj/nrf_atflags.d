@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_atflags.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_flags/nrf_atflags.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_flags/nrf_atflags.c \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52.h \
  ../../../../../../components/toolchain/cmsis/include/core_cm4.h \
@@ -28,4 +28,4 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_atflags.o: \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stddef.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_flags/nrf_atflags.h
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/atomic_flags/nrf_atflags.h

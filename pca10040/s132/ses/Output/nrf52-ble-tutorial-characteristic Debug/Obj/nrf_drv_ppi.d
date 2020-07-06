@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_ppi.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_ppi.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_ppi.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_ppi.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_ppi.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_ppi.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \

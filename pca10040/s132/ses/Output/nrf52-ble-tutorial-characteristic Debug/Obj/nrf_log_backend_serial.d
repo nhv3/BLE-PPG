@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_log_backend_serial.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_serial.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,7 +27,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_log_backend_serial.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_serial.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_backend_serial.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_backend_interface.h \
  ../../../../../../components/libraries/experimental_memobj/nrf_memobj.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdlib.h \
@@ -52,5 +52,5 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_log_backend_serial.o: \
  ../../../../../../components/libraries/experimental_log/nrf_log_ctrl.h \
  ../../../../../../components/libraries/experimental_log/src/nrf_log_ctrl_internal.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_backend_interface.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_internal.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/experimental_log/src/nrf_log_internal.h \
  ../../../../../../components/libraries/experimental_log/nrf_log_types.h

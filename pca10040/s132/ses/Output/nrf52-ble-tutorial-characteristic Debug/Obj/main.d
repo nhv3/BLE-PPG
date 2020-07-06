@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/main.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/main.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/main.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \
  ../../../../../../components/softdevice/s132/headers/nrf_svc.h \
@@ -130,15 +130,16 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/main.o: \
  ../../../../../../modules/nrfx/drivers/include/nrfx_twi.h \
  ../../../../../../modules/nrfx/hal/nrf_twi.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/custom_board.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/custom_board.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/math.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
  ../../../../../../external/segger_rtt/SEGGER_RTT.h \
  ../../../../../../external/segger_rtt/SEGGER_RTT_Conf.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_gpiote.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_gpiote.h \
  ../../../../../../modules/nrfx/hal/nrf_gpiote.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/hrm.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/hrm.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE_programmer.h

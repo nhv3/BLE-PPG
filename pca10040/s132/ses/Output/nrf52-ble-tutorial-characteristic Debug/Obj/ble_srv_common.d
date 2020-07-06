@@ -1,6 +1,6 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/ble_srv_common.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_srv_common.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_srv_common.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_srv_common.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/common/ble_srv_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../components/softdevice/s132/headers/ble_types.h \

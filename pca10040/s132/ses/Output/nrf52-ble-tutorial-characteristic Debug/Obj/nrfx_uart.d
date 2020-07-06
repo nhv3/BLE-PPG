@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrfx_uart.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/nrfx_uart.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/nrfx_uart.c \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
@@ -49,7 +49,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrfx_uart.o: \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
  ../../../../../../modules/nrfx/drivers/include/nrfx_uart.h \
  ../../../../../../modules/nrfx/hal/nrf_uart.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.h \
  ../../../../../../modules/nrfx/hal/nrf_gpio.h \
  ../../../../../../integration/nrfx/nrfx_log.h \
  ../../../../../../components/libraries/experimental_log/nrf_log.h \

@@ -1,14 +1,14 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/Calibration_AFE4404.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.c \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
+ /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
- /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stddef.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \

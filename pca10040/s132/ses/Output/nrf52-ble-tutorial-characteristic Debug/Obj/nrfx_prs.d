@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrfx_prs.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.c \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
@@ -47,7 +47,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrfx_prs.o: \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s132/headers/nrf_sd_def.h \
  ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/drivers/src/prs/nrfx_prs.h \
  ../../../../../../integration/nrfx/nrfx_log.h \
  ../../../../../../components/libraries/experimental_log/nrf_log.h \
  ../../../../../../components/libraries/util/sdk_common.h \

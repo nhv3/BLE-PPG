@@ -1,12 +1,15 @@
-Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_twi.o: \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_twi.c \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/integration/nrfx/legacy/nrf_drv_twi.h \
+Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/AFE_programmer.o: \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE_programmer.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE_programmer.h \
+ /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
+ /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
+ /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
+ ../../../../../../components/libraries/delay/nrf_delay.h \
  ../../../../../../modules/nrfx/nrfx.h \
  ../../../../../../integration/nrfx/nrfx_config.h ../config/sdk_config.h \
  ../../../../../../modules/nrfx/drivers/nrfx_common.h \
- /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stddef.h \
- /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
  ../../../../../../modules/nrfx/mdk/nrf.h \
  ../../../../../../modules/nrfx/mdk/nrf52.h \
@@ -39,7 +42,6 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_twi.o: \
  ../../../../../../components/softdevice/s132/headers/nrf_nvic.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
  ../../../../../../components/libraries/util/app_error.h \
- /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/softdevice/s132/headers/nrf_error.h \
  ../../../../../../components/libraries/util/app_error_weak.h \
@@ -47,10 +49,4 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_drv_twi.o: \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/util/sdk_resources.h \
  ../../../../../../components/softdevice/s132/headers/nrf_sd_def.h \
- ../../../../../../modules/nrfx/drivers/nrfx_errors.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_twim.h \
- ../../../../../../modules/nrfx/hal/nrf_twim.h \
- ../../../../../../modules/nrfx/drivers/include/nrfx_twi.h \
- ../../../../../../modules/nrfx/hal/nrf_twi.h \
- ../../../../../../components/libraries/delay/nrf_delay.h \
- ../../../../../../modules/nrfx/hal/nrf_gpio.h
+ ../../../../../../modules/nrfx/drivers/nrfx_errors.h

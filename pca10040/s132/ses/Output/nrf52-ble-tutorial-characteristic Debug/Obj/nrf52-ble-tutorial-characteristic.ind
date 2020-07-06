@@ -60,6 +60,7 @@
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/AFE4404.o"
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/hrm.o"
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/Calibration_AFE4404.o"
+"Output/nrf52-ble-tutorial-characteristic Debug/Obj/AFE_programmer.o"
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/SEGGER_RTT.o"
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/SEGGER_RTT_Syscalls_SES.o"
 "Output/nrf52-ble-tutorial-characteristic Debug/Obj/SEGGER_RTT_printf.o"

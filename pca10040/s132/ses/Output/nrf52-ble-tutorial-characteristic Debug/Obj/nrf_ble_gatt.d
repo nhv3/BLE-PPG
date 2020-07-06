@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_ble_gatt.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/nrf_ble_gatt/nrf_ble_gatt.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,7 +27,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_ble_gatt.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/nrf_ble_gatt/nrf_ble_gatt.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/nrf_ble_gatt/nrf_ble_gatt.h \
  ../../../../../../components/softdevice/s132/headers/ble.h \
  ../../../../../../components/softdevice/s132/headers/nrf_svc.h \
  ../../../../../../components/softdevice/s132/headers/nrf_error.h \

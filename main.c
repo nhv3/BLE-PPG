@@ -45,6 +45,7 @@
 #include "Calibration_AFE4404.h"
 #include "hrm.h" //Code provided by TI to compute various heartrate parameters 
 #include "AFE4404.h" //Custom C functions for the ARM M4 Cortex 
+#include "AFE_programmer.h"
 
 /**********************************************************************************************************/
 /*                                              BEGIN GOLABAL DECLARATIONS                                */
@@ -82,6 +83,9 @@
 #define BA_SDA_PIN      27       // SDA signal pin for the current Arduino Breakout Board
 #define BA_SCL_PIN      26       // SCL signal pin for the current Arduino Breakout Board
 #define AMB_LED_1_VAL 0x2D // Register for the ambient value from phase 1 
+
+#define CALIB_PRF_UPDATE 900000
+
 int RESETZ = 2;
 int ADC_RDY = 25;
 
@@ -90,7 +94,7 @@ volatile int g_OneSecondFlag=0;
 volatile int apptimerrunning = 0;
 volatile int issue_disconnect = 0;
 volatile int calibFinsihed = 0;
-char LED_Sel = 2;
+char LED_Sel = 1;
 volatile int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
 volatile int prfcount = 0;
 volatile uint16_t prfcount=0;
@@ -123,7 +127,7 @@ uint32_t programming_data = 0;
 uint16_t stream_service;
 uint16_t  prog_service;
 
-uint8_t LED_phase = 0x00; //holds the LED phase
+uint8_t LED_phase = 0x07; //holds the LED phase, Default value is 7 which means were are enabling three phase mode 
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -134,7 +138,7 @@ ble_os_t m_sensor_service; //  Declare a service structure for sensor applicatio
 APP_TIMER_DEF(m_sensor_char_timer_id); // Declare an app_timer id variable and define sensor timer interval and define a timer interval
 static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_SERVICE_UUID, BLE_UUID_TYPE_BLE} }; // Use UUIDs for service(s) used in ysensor application.
 
-unsigned long AFE_Buffer[6]; 
+signed long AFE_Buffer[6] = {0,0,0,0,0,0}; 
 
 /**********************************************************************************************************/
 /*                                              BEGIN FUNCTION DECLARATIONS                               */
@@ -449,7 +453,6 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   switch (p_ble_evt->header.evt_id) {
   case BLE_GAP_EVT_DISCONNECTED:
     NRF_LOG_INFO("Disconnected.");
-   // printf("Device Disconnected ::: Disconnecting ::: Completed \n");
     app_timer_stop(m_sensor_char_timer_id);
     //Check if the timer expired which means we already turned the AFE off
     if (nrf_gpio_pin_out_read(RESETZ) == 1) 
@@ -461,7 +464,9 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     apptimerrunning = 0;
     readDataFlag = 0;
     issue_disconnect = 0;
-   streaming = false;
+    Calibration = 1;
+    streaming = false;
+    programming = false;
     break;
 
   case BLE_GAP_EVT_CONNECTED:
@@ -514,18 +519,15 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     break;
 
   case BLE_GATTS_EVT_WRITE:
-  //Sensor1 = 16
-  //Sensor2 = 19
-  //Sensor3 = 22
-  //Sensor4 = 25
 
     write_evt = &p_ble_evt->evt.gatts_evt.params.write;
     uint16_t handle = write_evt->handle;
 
     //Handle the case where we want to stream out data
-    if(handle == stream_service)
+    if(handle == stream_service) //Note that the stream_service handle is not the db handle, its the cccd 
     {
-     streaming = true;
+         streaming = true;
+         printf("Streaming Service Witten \n");
     }
 
     else if (handle == prog_service)
@@ -542,6 +544,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
         LED_phase = prog_data[0];
 
         programming = true; 
+        printf("Programming Service Witten \n");
 
     }
 
@@ -766,136 +769,145 @@ void DAC_CALIBRATION_AUTOSTART(void) {
   }
 }
 
-//Routine handler for calibrating each LED individually 
-void postCalib(signed long ambient1, signed long ambient2,LED_phase)
+
+//handler for three phase calibration. Each case will sequentially feed in the correct LED value and associated AMB1 value for calibration 
+void three_phase_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
 {
-        switch LED_phase 
+          switch(LED_Sel)
+          {
+
+            case 1: //LED1 Green
+              CalibrateAFE4404(LED1, AMB1, LED_phase);
+            break;
+    
+            case 2: //LED 2 Red
+              CalibrateAFE4404(LED2, AMB1, LED_phase);
+            break;
+
+            case 3: //LED3 NIR
+              CalibrateAFE4404(LED3, AMB1, LED_phase);
+            break; 
+
+            default: 
+            break;
+    
+          }
+}
+
+//Calibration routine for green-nir handler
+void green_nir_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
+{
+    switch (LED_Sel)
+          {
+
+            case 1: //LED1 Green
+              CalibrateAFE4404(LED1, LED2, LED_phase);
+            break;
+
+            case 3: //LED3 NIR
+              CalibrateAFE4404(LED3, AMB1, LED_phase); //Use LED2 as the ambient
+            break; 
+
+            default: 
+            break;
+    
+          }
+}
+
+//calibration routine for green-red handler
+void green_red_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
+{
+    switch (LED_Sel)
+          {
+
+            case 1: //LED1 Green
+              CalibrateAFE4404(LED1, AMB1, LED_phase);
+            break;
+    
+            case 2: //LED 2 Red
+              CalibrateAFE4404(LED2, AMB1, LED_phase); //Use LED3 as the ambient cancellation reference
+            break;
+
+            default: 
+            break;
+   
+          }
+}
+
+//Calibration routine for red-nir handler
+void red_nir_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
+{
+    switch (LED_Sel)
+          {
+    
+            case 2: //LED 2 Red
+              CalibrateAFE4404(LED2, LED1, LED_phase); //Use the green LED phase as the ambient calibration for red 
+            break;
+
+            case 3: //LED3 NIR
+              CalibrateAFE4404(LED3, AMB1, LED_phase);
+            break; 
+
+            default: 
+            break;
+    
+          }
+}
+
+//Routine handler for calibrating each LED individually 
+void postCalib(signed long LED1, signed long LED2,signed long LED3, signed long AMB1, uint8_t LED_phase)
+{
+        switch (LED_phase) 
         {
           case 0x01: //NIR phase only
+            CalibrateAFE4404(LED3, AMB1,LED_phase);
           break;
 
           case 0x02: //green phase only
+            CalibrateAFE4404(LED1,AMB1,LED_phase);
           break;
 
           case 0x03: //green and nir phase
+            green_nir_calib(LED1,LED2,LED3,AMB1,LED_phase);
           break;
 
           case 0x04: //red ohase only
+            CalibrateAFE4404(LED2, AMB1,LED_phase);
           break;
 
           case 0x05: //red and nir phase
+            red_nir_calib(LED1,LED2,LED3,AMB1,LED_phase);
           break;
 
           case 0x06: //red-green phase
+            green_red_calib(LED1,LED2,LED3,AMB1,LED_phase);
           break;
 
           case 0x07: //all phases enabled
-          three_phase_calib(ambient1);
+            three_phase_calib(LED1,LED2,LED3,AMB1,LED_phase);
           break;
         }
           
 }
 
-
-void three_phase_calib(signed long ambient1)
+void soft_disconnect(void) //for use outside of the ble softdevice handler
 {
-          switch(LED_Sel)
-          {
+  app_timer_stop(m_sensor_char_timer_id);
+  apptimerrunning = 0;
+  readDataFlag = 0;
+  AFE4404_ADCRDY_Interrupt_Disable();
+  AFE4404_Enable_HWPDN();
 
-            case 1:
-              CalibrateAFE4404(AFE_Buffer[1], ambient1);
-            break;
-    
-            case 2: 
-              CalibrateAFE4404(AFE_Buffer[0], ambient1);
-            break;
 
-            case 3: 
-              CalibrateAFE4404(AFE_Buffer[2], ambient1);
-            break; 
-
-            case 4: 
-              LED_Sel = 1;
-              Calibration = 0;
-            break; 
-
-            default: 
-            break;
-    
-          }
-}
-
-void two_phase_calib_RG(signed long ambient1,signed long ambient2)
-{
-          switch(LED_Sel)
-          {
-
-            case 1: //Green
-              CalibrateAFE4404(AFE_Buffer[1], ambient1);
-            break;
-    
-            case 2: //Red
-              CalibrateAFE4404(AFE_Buffer[0], ambient2);
-            break;
-
-            case 4: 
-              LED_Sel = 1;
-              Calibration = 0;
-            break; 
-
-            default: 
-            break;
-    
-          }
-}
-
-void two_phase_calib_RN(signed long ambient1,signed long ambient2)
-{
-          switch(LED_Sel)
-          {
-            case 2: 
-              CalibrateAFE4404(AFE_Buffer[0], ambient1);
-            break;
-
-            case 3: 
-              CalibrateAFE4404(AFE_Buffer[2], ambient1);
-            break; 
-
-            case 4: 
-              LED_Sel = 1;
-              Calibration = 0;
-            break; 
-
-            default: 
-            break;
-    
-          }
+  uint32_t err_code;
+  err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+  APP_ERROR_CHECK(err_code);
+  
 }
 
 
-void two_phase_calib_GN(signed long ambient1,signed long ambient2)
-{
-          switch(LED_Sel)
-          {
 
-            case 1:
-              CalibrateAFE4404(AFE_Buffer[1], ambient1);
-            break;
 
-            case 3: 
-              CalibrateAFE4404(AFE_Buffer[2], ambient1);
-            break; 
-
-            case 4: 
-              LED_Sel = 1;
-              Calibration = 0;
-            break; 
-
-            default: 
-            break;
-    
-          }
-}
 
 /**********************************************************************************************************/
 /*                                                  MAIN APP ENTRY                                        */
@@ -951,8 +963,7 @@ int main(void) {
   while (1) {
 
     bool streaming_select = ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)); //This will be true when we want to stream data to the phone. 
-    bool progamming_select = ((apptimerrunning == 1) && (programminging)); //This will be true when we only want to programm the device.
-
+    bool programming_select = ((apptimerrunning == 1) && (programming)); //This will be true when we only want to programm the device.
     //If the app timer is running then we are in a valid connection and we are okay to collect data and send it out
     if (streaming_select)
      {
@@ -969,14 +980,12 @@ int main(void) {
       //Create new buffers to hold each piece of data with the timestamp
       //Need 4 Bytes for the reading, and 4 bytes for the timestamp. This covers the entire 32 bit range. So each service will have 8 bytes being sent, for a total of 24 bytes for data
       time_tick_update = ticks_now;
-
-      test[0] = (int32_t)(AFE_Buffer[0]); //Get red val reg
-      test[1] = (int32_t)(AFE_Buffer[1]); //Get green val reg
-      test[2] = (int32_t)(AFE_Buffer[2]); //Get NIR val reg
+      test[0] = (int32_t)(AFE_Buffer[0]); //Get red-AMB1 val reg
+      test[1] = (int32_t)(AFE_Buffer[1]); //Get green-AMB1 val reg
+      test[2] = (int32_t)(AFE_Buffer[2]); //Get NIR-AMB1 val reg
       test[3] = (int32_t)(AFE_Buffer[3]); //Get AMB1 val reg
       test[4] = time_tick_update;
-      test[5] = 0;
-
+     
       //Use memcpy to get the correct blocks from the data to then send on over to the sensor update function
       uint8_t test_nibble[24];
 
@@ -989,23 +998,28 @@ int main(void) {
       {
         if(CALIBRATION_ENABLED == true)
         {
-          postCalib(AFE_Buffer[3], AFE_Buffer[2]);
+          postCalib(AFE_Buffer[1], AFE_Buffer[0], AFE_Buffer[2], AFE_Buffer[3],LED_phase);
         }
       }
 
-      //prfcount++;
-      //if (prfcount == 100000) {
-       // g_OneSecondFlag = 1;
-       // Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
-       // prfcount = 0;
-      //}
+      prfcount++;
+      if (prfcount == CALIB_PRF_UPDATE) //Each count update is at 10ms, or whatever the set sampling frequency is. Default = 15 minutes
+      {
+        g_OneSecondFlag = 1;
+        Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
+        prfcount = 0;
+      }
       AFE4404_ADCRDY_Interrupt_Enable();
     }
 
     //If programming is selected, program the AFE here 
     else if (programming_select)
     {
+        printf("Prog Service Update \n");
+        Calibration = 1;
         update_AFE(LED_phase);
+        programming = false; 
+        soft_disconnect();
 
 
     }

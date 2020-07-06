@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_fstorage_sd.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage_sd.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage_sd.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -27,8 +27,8 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_fstorage_sd.o: \
  ../../../../../../modules/nrfx/mdk/compiler_abstraction.h \
  ../../../../../../components/libraries/util/sdk_macros.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage_sd.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage_sd.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/libraries/fstorage/nrf_fstorage.h \
  ../../../../../../components/libraries/util/sdk_errors.h \
  ../../../../../../components/libraries/experimental_section_vars/nrf_section.h \
  ../../../../../../components/libraries/util/nordic_common.h \

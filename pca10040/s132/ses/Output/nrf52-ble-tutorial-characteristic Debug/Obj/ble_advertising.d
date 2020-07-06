@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/ble_advertising.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/ble_advertising/ble_advertising.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/ble_advertising/ble_advertising.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -40,7 +40,7 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/ble_advertising.o: \
  ../../../../../../components/softdevice/s132/headers/ble_gatt.h \
  ../../../../../../components/softdevice/s132/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s132/headers/ble_gatts.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/ble_advertising/ble_advertising.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/components/ble/ble_advertising/ble_advertising.h \
  ../../../../../../components/softdevice/s132/headers/ble_gattc.h \
  ../../../../../../components/softdevice/s132/headers/nrf_soc.h \
  ../../../../../../components/softdevice/s132/headers/nrf_error_soc.h \

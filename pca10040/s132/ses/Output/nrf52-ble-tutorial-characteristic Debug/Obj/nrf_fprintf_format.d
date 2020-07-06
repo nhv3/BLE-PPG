@@ -1,5 +1,5 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_fprintf_format.o: \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf_format.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf_format.c \
  ../../../../../../components/libraries/util/sdk_common.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdbool.h \
@@ -29,5 +29,5 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/nrf_fprintf_format.o: \
  ../../../../../../components/libraries/util/nrf_assert.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdarg.h \
  ../../../../../../components/libraries/util/nrf_assert.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf.h \
- /Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf_format.h
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/external/fprintf/nrf_fprintf_format.h
