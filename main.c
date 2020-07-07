@@ -94,7 +94,7 @@ volatile int g_OneSecondFlag=0;
 volatile int apptimerrunning = 0;
 volatile int issue_disconnect = 0;
 volatile int calibFinsihed = 0;
-char LED_Sel = 1;
+volatile char LED_Sel = 1;
 volatile int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
 volatile int prfcount = 0;
 volatile uint16_t prfcount=0;
@@ -109,7 +109,7 @@ volatile bool BLE_CONNECTED = false;
 volatile bool streaming = false;
 volatile bool programming = false; 
 
-bool CALIBRATION_ENABLED = true;
+volatile bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
 
 extern volatile int Calibration;  // Global variable which is controlled by the library. Keep checking the status of the variable
@@ -127,7 +127,19 @@ uint32_t programming_data = 0;
 uint16_t stream_service;
 uint16_t  prog_service;
 
+uint8_t developer_mode = 0;
 uint8_t LED_phase = 0x07; //holds the LED phase, Default value is 7 which means were are enabling three phase mode 
+uint8_t LED1_drive = 0x03;
+uint8_t LED2_drive = 0x03;
+uint8_t LED3_drive = 0x03;
+uint8_t TIA_R1 = 0x02;
+uint8_t TIA_C1 = 0x00;
+uint8_t TIA_R2 = 0x02;
+uint8_t TIA_C2 = 0x00;
+uint8_t en_sep = 0x00;
+
+
+
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -533,7 +545,7 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     else if (handle == prog_service)
     {
         //Setup an allocated chunk in memory to read out the data from the gatt server.
-        uint8_t prog_data[10] = {0xCC,0xCC};
+        uint8_t prog_data[10] = {0x00};
         ble_gatts_value_t  	temp;
         temp.p_value   = prog_data;
         temp.len      = 10;
@@ -541,16 +553,24 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
         sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, prog_service, &temp); //Read the prog_service write event 
         
-        LED_phase = prog_data[0];
-
+        //Unpack the data
+        developer_mode = prog_data[0];
+        LED_phase = prog_data[1];
+        LED1_drive = prog_data[2];
+        LED2_drive = prog_data[3];
+        LED3_drive = prog_data[4];
+        en_sep = prog_data[5];
+        TIA_R1 = prog_data[6];
+        TIA_C1 = prog_data[7];
+        TIA_R2 = prog_data[8];
+        TIA_C2 = prog_data[9];
+        printf("%X\n",prog_data[0]);
         programming = true; 
         printf("Programming Service Witten \n");
 
     }
-
     
   break;
-
 
   //This might seem odd, but we need to issue the disconnect after a CONN_PARAM_UPDATE has occured. For some reason if we issue the disconnect command in the timer
   //interrupt handler, the softdevice context derails and we get a kernel failure. However, this helps us avoid poor context handling.
@@ -905,10 +925,6 @@ void soft_disconnect(void) //for use outside of the ble softdevice handler
   
 }
 
-
-
-
-
 /**********************************************************************************************************/
 /*                                                  MAIN APP ENTRY                                        */
 /**********************************************************************************************************/
@@ -1017,11 +1033,9 @@ int main(void) {
     {
         printf("Prog Service Update \n");
         Calibration = 1;
-        update_AFE(LED_phase);
+        program_AFE4404(developer_mode,LED_phase,LED1_drive,LED2_drive,LED3_drive,TIA_R1,TIA_C1,en_sep,TIA_R2,TIA_C2);
         programming = false; 
         soft_disconnect();
-
-
     }
 
   } //End of while change log

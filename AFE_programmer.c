@@ -4,9 +4,10 @@
 #include "stdint.h"
 #include "nrf_delay.h"
 
-extern char LED_Sel;
+extern volatile char LED_Sel;
+extern volatile bool CALIBRATION_ENABLED;
 
-void update_AFE(uint8_t LED_phase)
+void update_AFE_phase(uint8_t LED_phase)
 
 {
         switch (LED_phase)
@@ -333,5 +334,56 @@ void update_AFE(uint8_t LED_phase)
           break;
   
         }
+
+}
+
+void update_LED_drive(uint8_t LED1_drive, uint8_t LED2_drive, uint8_t LED3_drive)
+{
+    //First 6 bits are LED1 control 
+    uint32_t LED1_val = (uint32_t)LED1_drive;
+    uint32_t LED2_val = (uint32_t)(LED2_drive << 6);
+    uint32_t LED3_val = (uint32_t)(LED3_drive << 12);
+    uint32_t LED_cntrl = LED3_val|LED2_val|LED1_val;
+
+    AFE4404_Reg_Write(0, 0x0); //CONTROL0
+    AFE4404_Reg_Write(AFE_LEDCNTRL,LED_cntrl);
+    AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); //seal the changes 
+}
+
+void update_gain(uint8_t en_sep, uint8_t TIA_R1, uint8_t TIA_C1, uint8_t TIA_R2, uint8_t TIA_C2)
+{
+  uint32_t r1 = (uint32_t)TIA_R1;
+  uint32_t c1 = (uint32_t)(TIA_C1 << 3);
+  uint32_t r2 = (uint32_t)TIA_R2;
+  uint32_t c2 = (uint32_t)(TIA_C2 << 3);
+  
+  uint32_t main_tia_gain = c1 | r1;
+  uint32_t sep_gain = c2 | r2;
+
+  if(en_sep == 1)
+  {
+      sep_gain = (0x8000 | sep_gain);
+  }
+    AFE4404_Reg_Write(0, 0x0); //CONTROL0
+    AFE4404_Reg_Write(AFE_TIAAMBGAIN,main_tia_gain);
+    AFE4404_Reg_Write(AFE_TIAGAIN,sep_gain);
+    AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); //seal the changes 
+}
+
+void program_AFE4404(uint8_t developer_mode, uint8_t LED_phase, uint8_t LED1_drive, uint8_t LED2_drive, uint8_t LED3_drive, uint8_t TIA_R1, uint8_t TIA_C1,uint8_t en_sep, uint8_t TIA_R2, uint8_t TIA_C2)
+{
+     if(developer_mode == 0) //program only the phase update
+     {
+        update_AFE_phase(LED_phase);
+        CALIBRATION_ENABLED = true;
+     }
+
+     else if (developer_mode == 1) //program phsae update and all other options
+     {
+       update_AFE_phase(LED_phase);
+       update_LED_drive(LED1_drive,LED2_drive,LED3_drive);
+       update_gain(en_sep,TIA_R1,TIA_C1,TIA_R2,TIA_C2);
+       CALIBRATION_ENABLED = false;
+     }
 
 }
