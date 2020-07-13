@@ -72,11 +72,11 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="326" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.h" selected="0" top="303" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="163" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.c" selected="0" top="43" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="98" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/util/app_error_weak.c" selected="0" top="73" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1018" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/timer/app_timer.c" selected="0" top="986" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="118" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/timer/app_timer.h" selected="0" top="85" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="11" y="987" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/timer/app_timer.c" selected="0" top="1010" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="8" y="112" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/timer/app_timer.h" selected="0" top="85" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="5916" useTextEdit="1" useBinaryEdit="0" left="0" path="../config/sdk_config.h" selected="0" top="5891" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="339" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/libraries/util/app_util.h" selected="0" top="307" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="211" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../sensor_service.c" selected="0" top="158" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="7" y="12" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../sensor_service.c" selected="0" top="363" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="30" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../sensor_service.h" selected="0" top="0" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="124" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../wearS_BLE_V1/I2C.c" selected="0" top="99" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="113" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/softdevice/s132/headers/ble_gap.h" selected="0" top="86" codecName="Default"/>
@@ -94,9 +94,9 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.c" selected="0" top="336" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="61" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/softdevice/s132/headers/nrf_error.h" selected="0" top="36" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="122" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.h" selected="0" top="96" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="1" y="373" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.c" selected="1" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="203" y="5" useTextEdit="1" useBinaryEdit="0" left="89" path="../../../AFE_programmer.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="16" y="935" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="1000" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="373" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.c" selected="0" top="8" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="5" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.h" selected="0" top="0" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="956" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="934" codecName="Default"/>
  </Files>
  <ARMCrossStudioWindow activeProject="nrf52-ble-tutorial-characteristic" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;C:/nordic_semi/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:/Users/tasif/Dropbox/hardware-nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nRF_Startup.s&#xa;&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nrf52_Vectors.s&#xa;" fileDialogInitialDirectory="/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG" debugSearchPath="" autoConnectCapabilities="3711"/>
 </session>

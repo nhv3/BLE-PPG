@@ -10,6 +10,7 @@
 extern volatile BLE_CONNECTED;
 extern uint16_t stream_service;
 extern uint16_t prog_service;
+extern uint16_t time_monitor_service;
 
 // function for some housekeeping of ble connections related to the sensor service and characteristic
 void ble_sensor_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
@@ -379,6 +380,7 @@ void sensor_service_init(ble_os_t * p_sensor_service)
     //Set up handle capture 
     stream_service = p_sensor_service->char2_handles.cccd_handle;
     prog_service = p_sensor_service->char3_handles.value_handle;
+    time_monitor_service = p_sensor_service->char4_handles.value_handle;
 
 }
 

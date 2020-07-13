@@ -63,7 +63,7 @@
 #define MAX_CONN_INTERVAL               MSEC_TO_UNITS(9, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
 #define SLAVE_LATENCY                   0                                       /**< Slave latency. */
 #define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
-#define SENSOR_CHAR_TIMER_INTERVAL APP_TIMER_TICKS(PPG_COLLECTION_TIME)                          //1000 ms intervals
+#define SENSOR_CHAR_TIMER_INTERVAL      APP_TIMER_TICKS(PPG_COLLECTION_TIME)                          //1000 ms intervals
 
 
 #define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
@@ -108,6 +108,8 @@ ble_gap_addr_t addres;
 volatile bool BLE_CONNECTED = false;
 volatile bool streaming = false;
 volatile bool programming = false; 
+volatile bool monitorEnabled = false;
+
 
 volatile bool CALIBRATION_ENABLED = true;
 unsigned long AFE44xx_SPO2_Data_buf[6];
@@ -126,6 +128,8 @@ uint32_t programming_data = 0;
 
 uint16_t stream_service;
 uint16_t  prog_service;
+uint16_t time_monitor_service;
+uint16_t monitor_reload = 0;
 
 uint8_t developer_mode = 0;
 uint8_t LED_phase = 0x07; //holds the LED phase, Default value is 7 which means were are enabling three phase mode 
@@ -137,9 +141,6 @@ uint8_t TIA_C1 = 0x00;
 uint8_t TIA_R2 = 0x02;
 uint8_t TIA_C2 = 0x00;
 uint8_t en_sep = 0x00;
-
-
-
 
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
@@ -490,15 +491,10 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
     err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
     APP_ERROR_CHECK(err_code);
-
-    //When connected; start app timer to let the data be captured and sent out
-    app_timer_start(m_sensor_char_timer_id, SENSOR_CHAR_TIMER_INTERVAL, NULL);
-    
     AFE4404_Disable_HWPDN();
     AFE4404_Trigger_HWReset();
     AFE4404_Init();
     AFE4404_ADCRDY_Interrupt_Enable();
-    apptimerrunning = 1;
     prfcount = 0;
     Calibration = 1;
     break;
@@ -564,10 +560,40 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
         TIA_C1 = prog_data[7];
         TIA_R2 = prog_data[8];
         TIA_C2 = prog_data[9];
-        printf("%X\n",prog_data[0]);
         programming = true; 
-        printf("Programming Service Witten \n");
+    }
 
+    else if(handle == time_monitor_service)
+    {
+        uint8_t time_data[3] = {0x00};
+        ble_gatts_value_t  	temp;
+        temp.p_value   = time_data;
+        temp.len      = 3;
+        temp.offset   = 0;
+        uint32_t length = 0;
+
+        sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID,time_monitor_service, &temp); //Read the prog_service write event 
+        monitorEnabled = time_data[0];
+        monitor_reload = ((uint16_t)time_data[2] << 8) | time_data[1]; //Need to stitch the last two bytes to get value;
+
+        if(monitorEnabled == 1)
+        {
+          length = APP_TIMER_TICKS(monitor_reload*1000); //convert seconds to ms incremenets for the timer 
+        }
+
+        else
+        {
+           length  = APP_TIMER_TICKS(1209600000); //Set the max to be 14 days, this exceeds the lifetime of the device. But we NEED the rtc timer to time sync the data time stamps.
+        }
+        
+        //When connected; start app timer to let the data be captured and sent out
+        app_timer_start(m_sensor_char_timer_id, length, NULL);
+        apptimerrunning = 1; //reguardless if the monitor is enabled, we need to go ahead and make the main loop run by giving this value a HIGH
+    }
+
+    else
+    {
+      printf("No catch");
     }
     
   break;
