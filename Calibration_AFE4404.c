@@ -54,7 +54,7 @@ const unsigned long AMB23_mask_LED = 0x0F801F;					// Mask for OFFDAC for LED2 a
 const unsigned long AMB123_mask_LED = 0x0F83FF;					// Mask for OFFDAC for LED1, LED2 and LED3 only (no AMB1)
 
 const unsigned int ILED_CURR_MIN_code = 1; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
-const unsigned int ILED_CURR_MAX_code = 10; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
+const unsigned int ILED_CURR_MAX_code = 6; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
 
 const short unsigned int LOW_THR_PERCENT = 30;       			// Low Threshold Percent
 const short unsigned int HIGH_THR_PERCENT = 90;      			// High Threshold percent
@@ -114,7 +114,7 @@ RF_VALUES RFValue_Init_GainCal = s2M; 							// Initial Rf for Gain calibration 
 unsigned int periodic_cal_req = 0;
 unsigned long Ipleth = 1875;
 unsigned int LED_DC_can = 6;
-
+extern volatile bool CALIBRATION_FINISHED;
 
 // Use this for 50mA range
 // int Ipleth_array[5] = { 1250, 1875, 2500, 3125, 3750 }; // codes for 1uA, 1.5uA ... 3uA expressed as 1000nA/0.8mA -- unit code is 0.8mA
@@ -1149,6 +1149,7 @@ void LED_phase_manager(long LED_phase)
                LED_Sel = 3; //Keep LED select value
                Calibration = 0; // This will cancel the calirbation routine 
                calibration_mode = sInitialize;
+               CALIBRATION_FINISHED=true;
                //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
           break;
 
@@ -1156,6 +1157,7 @@ void LED_phase_manager(long LED_phase)
                LED_Sel = 1; //Keep LED select value
                Calibration = 0; // This will cancel the calirbation routine 
                calibration_mode = sInitialize;
+                CALIBRATION_FINISHED=true;
                //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
           break;
 
@@ -1187,7 +1189,8 @@ void LED_phase_manager(long LED_phase)
                       AFE4404_Reg_Write(AFE_TIAGAIN, 0x8000|GAIN3); //Enable Separate Gain  
                       AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
                       AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|0x00|LED1));
-                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                      AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001);
+                        CALIBRATION_FINISHED=true;
                     }
           break;
 
@@ -1195,6 +1198,7 @@ void LED_phase_manager(long LED_phase)
                LED_Sel = 2; //Keep LED select value
                Calibration = 0; // This will cancel the calirbation routine 
                calibration_mode = sInitialize;
+                CALIBRATION_FINISHED=true;
                //No need to reprogram the device with the new parameters, because by default the alogrithm is designed to run in 1-phase only. In the optimizer, it will incrementally program the AFE
 
           break;
@@ -1229,6 +1233,7 @@ void LED_phase_manager(long LED_phase)
                       AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN2);              // TIA gain = gain from LED 2 phase (will incorporate more complex scheme later)       
                       AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|0x00));
                       AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                       CALIBRATION_FINISHED=true;
                     }
 
 
@@ -1266,8 +1271,7 @@ void LED_phase_manager(long LED_phase)
                       AFE4404_Reg_Write(AFE_LEDCNTRL,(LED2|LED1));
                       AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
 
-                      LED2 = AFE4404_Reg_Read(AFE_LEDCNTRL);
-                      printf("%X",LED2);
+                       CALIBRATION_FINISHED=true;
                     }
 
           break;
@@ -1275,7 +1279,7 @@ void LED_phase_manager(long LED_phase)
           case 0x07: //all phases enabled
                     if(LED_Sel == 1)
                     {
-                    //printf("LED1::: Completed \n");
+                    printf("LED1::: Completed \n");
                       LED_Sel = 2;
                       Calibration = 1;
                       calibration_mode = sInitialize;
@@ -1287,7 +1291,7 @@ void LED_phase_manager(long LED_phase)
 
                     else if(LED_Sel == 2)
                     {
-                    //printf("LED2::: Completed \n");
+                    printf("LED2::: Completed \n");
                       LED_Sel = 3;
                       Calibration = 1;
                       calibration_mode = sInitialize;
@@ -1301,7 +1305,7 @@ void LED_phase_manager(long LED_phase)
 
                     else
                     {
-                    //printf("LED3::: Completed \n");
+                    printf("LED3::: Completed \n");
                       LED_Sel = 1;
                       Calibration = 0; // This will cancel the calirbation routine 
                       calibration_mode = sInitialize;
@@ -1313,10 +1317,11 @@ void LED_phase_manager(long LED_phase)
 
                       AFE4404_Reg_Write(AFE_CONTROL0, 0x00000000);            // write mode           
                       AFE4404_Reg_Write(AFE_DAC_SETTING_REG, (DAC2|DAC1|DAC3)); // 
-                      AFE4404_Reg_Write(AFE_TIAGAIN,GAIN2); //Enable Separate Gain  
+                      AFE4404_Reg_Write(AFE_TIAGAIN,(0x8000|GAIN2)); //Enable Separate Gain  
                       AFE4404_Reg_Write(AFE_TIAAMBGAIN, GAIN1);              // TIA gain = gain from LED 1 phase (will incorporate more complex scheme later)       
                       AFE4404_Reg_Write(AFE_LEDCNTRL,(LED3|LED2|LED1));
                       AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); 
+                       CALIBRATION_FINISHED=true;
                     }
 
           break;
@@ -1563,11 +1568,11 @@ if (ILEDCode_gc > ILED_CURR_MAX_code)
 } 
 else 
 {
-	if (ILEDCode_gc < ILED_CURR_MIN_code) 
+if (ILEDCode_gc < ILED_CURR_MIN_code) 
 	{
 		AMB_DAC_VAL = (AMB_DAC_VAL * ILED_CURR_MIN_code) / ILEDCode_gc;
 		ILEDCode_gc = ILED_CURR_MIN_code;
-	}
+	}	
 }
 	 
 //  if (ILEDCode2_gc > ILED_CURR_MAX_code) 

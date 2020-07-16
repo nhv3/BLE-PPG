@@ -1,88 +1,85 @@
-#include "sensor_service.h"
-#include <stdbool.h>
-#include <stdint.h>
-#include <string.h>
-#include "nordic_common.h"
-#include "nrf.h"
-#include "nrf_drv_saadc.h"
-#include "nrf_drv_ppi.h"
-#include "nrf_drv_timer.h"
+#include "AFE4404.h" //Custom C functions for the ARM M4 Cortex
+#include "AFE_programmer.h"
+#include "Calibration_AFE4404.h"
+#include "I2C.h"        // i2c
+#include "SEGGER_RTT.h" // debugging
 #include "app_error.h"
+#include "app_timer.h"
+#include "app_util_platform.h"
 #include "ble.h"
-#include "ble_hci.h"
-#include "ble_srv_common.h"
 #include "ble_advdata.h"
 #include "ble_advertising.h"
 #include "ble_conn_params.h"
-#include "nrf_sdh.h"
-#include "nrf_sdh_soc.h"
-#include "nrf_sdh_ble.h"
-#include "app_timer.h"
-#include "fds.h"
-#include "peer_manager.h"
-#include "bsp_btn_ble.h"
-#include "sensorsim.h"
 #include "ble_conn_state.h"
+#include "ble_hci.h"
+#include "ble_srv_common.h"
+#include "boards.h"
+#include "bsp_btn_ble.h"
+#include "custom_board.h"
+#include "fds.h"
+#include "hrm.h" //Code provided by TI to compute various heartrate parameters
+#include "nordic_common.h"
+#include "nrf.h"
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
-#include "nrf_pwr_mgmt.h"
+#include "nrf_delay.h"
+#include "nrf_drv_gpiote.h"
+#include "nrf_drv_ppi.h"
+#include "nrf_drv_saadc.h"
+#include "nrf_drv_timer.h"
+#include "nrf_drv_twi.h"
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+#include "nrf_pwr_mgmt.h"
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_sdh_soc.h"
 #include "nrf_sdm.h"
-#include <stdio.h>
-#include "boards.h"
-#include "app_util_platform.h"
-#include "app_error.h"
-#include "nrf_drv_twi.h"
-#include "nrf_delay.h"
-#include "custom_board.h"
+#include "peer_manager.h"
+#include "sensor_service.h"
+#include "sensorsim.h"
 #include <math.h>
-#include "I2C.h"              // i2c
-#include "SEGGER_RTT.h"       // debugging
-#include "nrf_delay.h" 
-#include "nrf_drv_gpiote.h"
-#include "Calibration_AFE4404.h"
-#include "hrm.h" //Code provided by TI to compute various heartrate parameters 
-#include "AFE4404.h" //Custom C functions for the ARM M4 Cortex 
-#include "AFE_programmer.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 /**********************************************************************************************************/
 /*                                              BEGIN GOLABAL DECLARATIONS                                */
 /**********************************************************************************************************/
-#define PPG_COLLECTION_TIME   120000
+#define PPG_COLLECTION_TIME 120000
 
-#define DEVICE_NAME                     "GUTSENS"                 /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME               "Stanford University"   /**< Manufacturer. Will be passed to Device Information Service. */
-#define APP_ADV_INTERVAL                160                     /**< The advertising interval (in units of 0.625 ms (16 kHz). This value corresponds to 187.5 ms). */
-#define APP_ADV_DURATION                0                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
+#define DEVICE_NAME "GUTSENS"                   /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME "Stanford University" /**< Manufacturer. Will be passed to Device Information Service. */
+#define APP_ADV_INTERVAL 160                    /**< The advertising interval (in units of 0.625 ms (16 kHz). This value corresponds to 187.5 ms). */
+#define APP_ADV_DURATION 0                      /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
 
-#define APP_BLE_OBSERVER_PRIO           3                                       /**< Application's BLE observer priority. You shouldn't need to modify this value. */
-#define APP_BLE_CONN_CFG_TAG            1                                       /**< A tag identifying the SoftDevice BLE configuration. */
-#define MIN_CONN_INTERVAL               MSEC_TO_UNITS(8, UNIT_1_25_MS)        /**< Minimum acceptable connection interval (7 mseconds). */
-#define MAX_CONN_INTERVAL               MSEC_TO_UNITS(9, UNIT_1_25_MS)        /**< Maximum acceptable connection interval (0.2 second). */
-#define SLAVE_LATENCY                   0                                       /**< Slave latency. */
-#define CONN_SUP_TIMEOUT                MSEC_TO_UNITS(4000, UNIT_10_MS)         /**< Connection supervisory timeout (4 seconds). */
-#define SENSOR_CHAR_TIMER_INTERVAL      APP_TIMER_TICKS(PPG_COLLECTION_TIME)                          //1000 ms intervals
+#define APP_BLE_OBSERVER_PRIO 3                                         /**< Application's BLE observer priority. You shouldn't need to modify this value. */
+#define APP_BLE_CONN_CFG_TAG 1                                          /**< A tag identifying the SoftDevice BLE configuration. */
+#define MIN_CONN_INTERVAL MSEC_TO_UNITS(8, UNIT_1_25_MS)                /**< Minimum acceptable connection interval (7 mseconds). */
+#define MAX_CONN_INTERVAL MSEC_TO_UNITS(9, UNIT_1_25_MS)                /**< Maximum acceptable connection interval (0.2 second). */
+#define SLAVE_LATENCY 0                                                 /**< Slave latency. */
+#define CONN_SUP_TIMEOUT MSEC_TO_UNITS(4000, UNIT_10_MS)                /**< Connection supervisory timeout (4 seconds). */
+#define SENSOR_CHAR_TIMER_INTERVAL APP_TIMER_TICKS(PPG_COLLECTION_TIME) //1000 ms intervals
 
+#define FIRST_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(1)    /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(30000) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT 3                       /**< Number of attempts before giving up the connection parameter negotiation. */
 
-#define FIRST_CONN_PARAMS_UPDATE_DELAY  APP_TIMER_TICKS(1)                   /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
-#define NEXT_CONN_PARAMS_UPDATE_DELAY   APP_TIMER_TICKS(30000)                  /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT    3                                       /**< Number of attempts before giving up the connection parameter negotiation. */
+#define SEC_PARAM_BOND 1                               /**< Perform bonding. */
+#define SEC_PARAM_MITM 0                               /**< Man In The Middle protection not required. */
+#define SEC_PARAM_LESC 0                               /**< LE Secure Connections not enabled. */
+#define SEC_PARAM_KEYPRESS 0                           /**< Keypress notifications not enabled. */
+#define SEC_PARAM_IO_CAPABILITIES BLE_GAP_IO_CAPS_NONE /**< No I/O capabilities. */
+#define SEC_PARAM_OOB 0                                /**< Out Of Band data not available. */
+#define SEC_PARAM_MIN_KEY_SIZE 7                       /**< Minimum encryption key size. */
+#define SEC_PARAM_MAX_KEY_SIZE 16                      /**< Maximum encryption key size. */
+#define DEAD_BEEF 0xDEADBEEF                           /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-#define SEC_PARAM_BOND                  1                                       /**< Perform bonding. */
-#define SEC_PARAM_MITM                  0                                       /**< Man In The Middle protection not required. */
-#define SEC_PARAM_LESC                  0                                       /**< LE Secure Connections not enabled. */
-#define SEC_PARAM_KEYPRESS              0                                       /**< Keypress notifications not enabled. */
-#define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE                    /**< No I/O capabilities. */
-#define SEC_PARAM_OOB                   0                                       /**< Out Of Band data not available. */
-#define SEC_PARAM_MIN_KEY_SIZE          7                                       /**< Minimum encryption key size. */
-#define SEC_PARAM_MAX_KEY_SIZE          16                                      /**< Maximum encryption key size. */
-#define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
-
-#define BA_SDA_PIN      27       // SDA signal pin for the current Arduino Breakout Board
-#define BA_SCL_PIN      26       // SCL signal pin for the current Arduino Breakout Board
-#define AMB_LED_1_VAL 0x2D // Register for the ambient value from phase 1 
+#define BA_SDA_PIN 27      // SDA signal pin for the current Arduino Breakout Board
+#define BA_SCL_PIN 26      // SCL signal pin for the current Arduino Breakout Board
+#define AMB_LED_1_VAL 0x2D // Register for the ambient value from phase 1
 
 #define CALIB_PRF_UPDATE 900000
 
@@ -90,49 +87,51 @@ int RESETZ = 2;
 int ADC_RDY = 25;
 
 volatile int readDataFlag = 0;
-volatile int g_OneSecondFlag=0;
+volatile int g_OneSecondFlag = 0;
 volatile int apptimerrunning = 0;
 volatile int issue_disconnect = 0;
 volatile int calibFinsihed = 0;
 volatile char LED_Sel = 1;
 volatile int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
 volatile int prfcount = 0;
-volatile uint16_t prfcount=0;
+volatile uint16_t prfcount = 0;
 volatile int32_t ticks_now = 0;
 int32_t time_tick_update = 0;
 int32_t ramp1 = -2097152;
-int32_t ramp2= -2097152;
+int32_t ramp2 = -2097152;
 int32_t ramp3 = -2097152;
 ble_gap_addr_t addres;
 
 volatile bool BLE_CONNECTED = false;
 volatile bool streaming = false;
-volatile bool programming = false; 
+volatile bool programming = false;
 volatile bool monitorEnabled = false;
 
-
 volatile bool CALIBRATION_ENABLED = true;
+volatile bool CALIBRATION_FINISHED = false;
 unsigned long AFE44xx_SPO2_Data_buf[6];
 
-extern volatile int Calibration;  // Global variable which is controlled by the library. Keep checking the status of the variable
+extern volatile int Calibration; // Global variable which is controlled by the library. Keep checking the status of the variable
 extern long CTR;
 extern unsigned long AFE44xx_Current_Register_Settings[5];
 extern unsigned char HeartRate;
+extern uint32_t Settings[5];
+extern uint8_t setting_8b[20];
 
 int32_t txString[14];
-int32_t Red[2] = {0,0};
-int32_t Green[2] = {0,0};
-int32_t Nir[2] = {0,0};
-int32_t test[6] = {0,0,0,0,0,0};
+int32_t Red[2] = {0, 0};
+int32_t Green[2] = {0, 0};
+int32_t Nir[2] = {0, 0};
+int32_t test[6] = {0, 0, 0, 0, 0, 0};
 uint32_t programming_data = 0;
 
 uint16_t stream_service;
-uint16_t  prog_service;
+uint16_t prog_service;
 uint16_t time_monitor_service;
+uint16_t readback_service;
 uint16_t monitor_reload = 0;
 
 uint8_t developer_mode = 0;
-uint8_t LED_phase = 0x07; //holds the LED phase, Default value is 7 which means were are enabling three phase mode 
 uint8_t LED1_drive = 0x03;
 uint8_t LED2_drive = 0x03;
 uint8_t LED3_drive = 0x03;
@@ -141,17 +140,27 @@ uint8_t TIA_C1 = 0x00;
 uint8_t TIA_R2 = 0x02;
 uint8_t TIA_C2 = 0x00;
 uint8_t en_sep = 0x00;
+uint8_t DAC1_off = 0x00;
+uint8_t DAC2_off = 0x00;
+uint8_t DAC3_off = 0x00;
+uint8_t DACA_off = 0x00;
 
-NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
-NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
-BLE_ADVERTISING_DEF(m_advertising);                                             /**< Advertising module instance. */
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
+volatile uint8_t LED_phase = 0x07; //holds the LED phase, Default value is 7 which means were are enabling three phase mode
+volatile uint32_t LED_cntrl = 0x0030CF;
+volatile uint32_t main_tia_gain = 0x000003;
+volatile uint32_t sep_gain =  0x008003;
+volatile uint32_t dac_set = 0x000000;
 
-ble_os_t m_sensor_service; //  Declare a service structure for sensor application
-APP_TIMER_DEF(m_sensor_char_timer_id); // Declare an app_timer id variable and define sensor timer interval and define a timer interval
-static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_SERVICE_UUID, BLE_UUID_TYPE_BLE} }; // Use UUIDs for service(s) used in ysensor application.
+NRF_BLE_GATT_DEF(m_gatt);                                /**< GATT module instance. */
+NRF_BLE_QWR_DEF(m_qwr);                                  /**< Context for the Queued Write module.*/
+BLE_ADVERTISING_DEF(m_advertising);                      /**< Advertising module instance. */
+static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
 
-signed long AFE_Buffer[6] = {0,0,0,0,0,0}; 
+ble_os_t m_sensor_service;                                                      //  Declare a service structure for sensor application
+APP_TIMER_DEF(m_sensor_char_timer_id);                                          // Declare an app_timer id variable and define sensor timer interval and define a timer interval
+static ble_uuid_t m_adv_uuids[] = {{BLE_UUID_SERVICE_UUID, BLE_UUID_TYPE_BLE}}; // Use UUIDs for service(s) used in ysensor application.
+
+signed long AFE_Buffer[6] = {0, 0, 0, 0, 0, 0};
 
 /**********************************************************************************************************/
 /*                                              BEGIN FUNCTION DECLARATIONS                               */
@@ -461,15 +470,14 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt) {
  */
 static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
   ret_code_t err_code = NRF_SUCCESS;
-  ble_gatts_evt_write_t const * write_evt;
+  ble_gatts_evt_write_t const *write_evt;
 
   switch (p_ble_evt->header.evt_id) {
   case BLE_GAP_EVT_DISCONNECTED:
     NRF_LOG_INFO("Disconnected.");
     app_timer_stop(m_sensor_char_timer_id);
     //Check if the timer expired which means we already turned the AFE off
-    if (nrf_gpio_pin_out_read(RESETZ) == 1) 
-    {
+    if (nrf_gpio_pin_out_read(RESETZ) == 1) {
       AFE4404_Enable_HWPDN();
     }
 
@@ -484,16 +492,24 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
   case BLE_GAP_EVT_CONNECTED:
     NRF_LOG_INFO("Connected.");
-   // printf("Device Connected ::: Completed \n");
+    printf("Device Connected ::: Completed \n");
     err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
     APP_ERROR_CHECK(err_code);
 
     m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
     err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
     APP_ERROR_CHECK(err_code);
-    AFE4404_Disable_HWPDN();
-    AFE4404_Trigger_HWReset();
     AFE4404_Init();
+    update_AFE_phase(LED_phase); //recall the scheme if set
+
+  //Recall the last saved prog update
+    AFE4404_Reg_Write(0, 0x0); //CONTROL0
+    AFE4404_Reg_Write(AFE_DAC_SETTING_REG,dac_set);
+    AFE4404_Reg_Write(AFE_TIAAMBGAIN,main_tia_gain);
+    AFE4404_Reg_Write(AFE_TIAGAIN,sep_gain);
+    AFE4404_Reg_Write(AFE_LEDCNTRL,LED_cntrl);
+    AFE4404_Reg_Write(AFE_CONTROL0, 0x00000001); //seal the changes
+
     AFE4404_ADCRDY_Interrupt_Enable();
     prfcount = 0;
     Calibration = 1;
@@ -532,77 +548,79 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
     uint16_t handle = write_evt->handle;
 
     //Handle the case where we want to stream out data
-    if(handle == stream_service) //Note that the stream_service handle is not the db handle, its the cccd 
+    if (handle == stream_service) //Note that the stream_service handle is not the db handle, its the cccd
     {
-         streaming = true;
-         printf("Streaming Service Witten \n");
+      streaming = true;
+      if(developer_mode==1)
+      {
+        CALIBRATION_FINISHED =true;
+      }
+
     }
 
-    else if (handle == prog_service)
-    {
-        //Setup an allocated chunk in memory to read out the data from the gatt server.
-        uint8_t prog_data[10] = {0x00};
-        ble_gatts_value_t  	temp;
-        temp.p_value   = prog_data;
-        temp.len      = 10;
-        temp.offset   = 0;
+    else if (handle == prog_service) {
+      //Setup an allocated chunk in memory to read out the data from the gatt server.
+      uint8_t prog_data[14] = {0x00};
+      ble_gatts_value_t temp;
+      temp.p_value = prog_data;
+      temp.len = 14;
+      temp.offset = 0;
 
-        sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, prog_service, &temp); //Read the prog_service write event 
-        
-        //Unpack the data
-        developer_mode = prog_data[0];
-        LED_phase = prog_data[1];
-        LED1_drive = prog_data[2];
-        LED2_drive = prog_data[3];
-        LED3_drive = prog_data[4];
-        en_sep = prog_data[5];
-        TIA_R1 = prog_data[6];
-        TIA_C1 = prog_data[7];
-        TIA_R2 = prog_data[8];
-        TIA_C2 = prog_data[9];
-        programming = true; 
+      sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, prog_service, &temp); //Read the prog_service write event
+
+      //Unpack the data
+      developer_mode = prog_data[0];
+      LED_phase = prog_data[1];
+      LED1_drive = prog_data[2];
+      LED2_drive = prog_data[3];
+      LED3_drive = prog_data[4];
+      en_sep = prog_data[5];
+      TIA_R1 = prog_data[6];
+      TIA_C1 = prog_data[7];
+      TIA_R2 = prog_data[8];
+      TIA_C2 = prog_data[9];
+      DAC1_off = prog_data[10];
+      DAC2_off = prog_data[11];
+      DAC3_off = prog_data[12];
+      DACA_off = prog_data[13];
+
+      printf("%X\n", DAC3_off);
+      printf("%X\n", DACA_off);
+      programming = true;
     }
 
-    else if(handle == time_monitor_service)
-    {
-        uint8_t time_data[3] = {0x00};
-        ble_gatts_value_t  	temp;
-        temp.p_value   = time_data;
-        temp.len      = 3;
-        temp.offset   = 0;
-        uint32_t length = 0;
+    else if (handle == time_monitor_service) {
+      uint8_t time_data[3] = {0x00};
+      ble_gatts_value_t temp;
+      temp.p_value = time_data;
+      temp.len = 3;
+      temp.offset = 0;
+      uint32_t length = 0;
 
-        sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID,time_monitor_service, &temp); //Read the prog_service write event 
-        monitorEnabled = time_data[0];
-        monitor_reload = ((uint16_t)time_data[2] << 8) | time_data[1]; //Need to stitch the last two bytes to get value;
+      sd_ble_gatts_value_get(BLE_CONN_HANDLE_INVALID, time_monitor_service, &temp); //Read the prog_service write event
+      monitorEnabled = time_data[0];
+      monitor_reload = ((uint16_t)time_data[2] << 8) | time_data[1]; //Need to stitch the last two bytes to get value;
 
-        if(monitorEnabled == 1)
-        {
-          length = APP_TIMER_TICKS(monitor_reload*1000); //convert seconds to ms incremenets for the timer 
-        }
+      if (monitorEnabled == 1) {
+        length = APP_TIMER_TICKS(monitor_reload * 1000); //convert seconds to ms incremenets for the timer
+      }
 
-        else
-        {
-           length  = APP_TIMER_TICKS(1209600000); //Set the max to be 14 days, this exceeds the lifetime of the device. But we NEED the rtc timer to time sync the data time stamps.
-        }
-        
-        //When connected; start app timer to let the data be captured and sent out
-        app_timer_start(m_sensor_char_timer_id, length, NULL);
-        apptimerrunning = 1; //reguardless if the monitor is enabled, we need to go ahead and make the main loop run by giving this value a HIGH
+      else {
+        length = APP_TIMER_TICKS(1209600000); //Set the max to be 14 days, this exceeds the lifetime of the device. But we NEED the rtc timer to time sync the data time stamps.
+      }
+
+      //When connected; start app timer to let the data be captured and sent out
+      app_timer_start(m_sensor_char_timer_id, length, NULL);
+      apptimerrunning = 1; //reguardless if the monitor is enabled, we need to go ahead and make the main loop run by giving this value a HIGH
     }
 
-    else
-    {
-      printf("No catch");
-    }
-    
-  break;
+    break;
 
-  //This might seem odd, but we need to issue the disconnect after a CONN_PARAM_UPDATE has occured. For some reason if we issue the disconnect command in the timer
-  //interrupt handler, the softdevice context derails and we get a kernel failure. However, this helps us avoid poor context handling.
-    case BLE_GATTS_EVT_HVN_TX_COMPLETE:
-     if (issue_disconnect == 1) {
-   //  printf("Timer Expired! ::: Disconnecting ::: Completed \n");
+    //This might seem odd, but we need to issue the disconnect after a CONN_PARAM_UPDATE has occured. For some reason if we issue the disconnect command in the timer
+    //interrupt handler, the softdevice context derails and we get a kernel failure. However, this helps us avoid poor context handling.
+  case BLE_GATTS_EVT_HVN_TX_COMPLETE:
+    if (issue_disconnect == 1) {
+      //  printf("Timer Expired! ::: Disconnecting ::: Completed \n");
       err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
       APP_ERROR_CHECK(err_code);
       issue_disconnect = 0;
@@ -769,11 +787,10 @@ double array_mean(int low, int high, uint16_t a[]) {
   return ((double)sum / (high - low));
 }
 
-void ADCRDY_HANDLER(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) 
-{
- // readDataFlag = 1; //Set the readflag high to let us know that data has been captured on the ADC
-   readDataFlag=1; //Set the readflag high to let us know that data has been captured on the ADC
-  //Grab the timer flag from the clock timer 
+void ADCRDY_HANDLER(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action) {
+  // readDataFlag = 1; //Set the readflag high to let us know that data has been captured on the ADC
+  readDataFlag = 1; //Set the readflag high to let us know that data has been captured on the ADC
+  //Grab the timer flag from the clock timer
   ticks_now = app_timer_cnt_get();
 }
 
@@ -791,14 +808,13 @@ void ADC_READY_GPIO_HANDLER_INIT(void) {
   nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(true);
   /*Set the pin input to Pulldown mode to keep the state defined when no driver present*/
   in_config.pull = NRF_GPIO_PIN_PULLDOWN;
-  out_config.init_state =  NRF_GPIOTE_INITIAL_VALUE_HIGH;
+  out_config.init_state = NRF_GPIOTE_INITIAL_VALUE_HIGH;
 
   /*Send Init config to GPIOTE handler*/
   err_code = nrf_drv_gpiote_in_init(ADC_RDY, &in_config, ADCRDY_HANDLER);
   APP_ERROR_CHECK(err_code);
   err_code = nrf_drv_gpiote_out_init(17, &out_config);
   APP_ERROR_CHECK(err_code);
-  
 }
 //Function for calibrating the DAC offset with PD disconnected. Runs once at start up and then ceases. Its for the inherient offset in the input.
 void DAC_CALIBRATION_AUTOSTART(void) {
@@ -815,125 +831,110 @@ void DAC_CALIBRATION_AUTOSTART(void) {
   }
 }
 
+//handler for three phase calibration. Each case will sequentially feed in the correct LED value and associated AMB1 value for calibration
+void three_phase_calib(signed long LED1, signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase) {
+  switch (LED_Sel) {
 
-//handler for three phase calibration. Each case will sequentially feed in the correct LED value and associated AMB1 value for calibration 
-void three_phase_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
-{
-          switch(LED_Sel)
-          {
+  case 1: //LED1 Green
+    CalibrateAFE4404(LED1, AMB1, LED_phase);
+    break;
 
-            case 1: //LED1 Green
-              CalibrateAFE4404(LED1, AMB1, LED_phase);
-            break;
-    
-            case 2: //LED 2 Red
-              CalibrateAFE4404(LED2, AMB1, LED_phase);
-            break;
+  case 2: //LED 2 Red
+    CalibrateAFE4404(LED2, AMB1, LED_phase);
+    break;
 
-            case 3: //LED3 NIR
-              CalibrateAFE4404(LED3, AMB1, LED_phase);
-            break; 
+  case 3: //LED3 NIR
+    CalibrateAFE4404(LED3, AMB1, LED_phase);
+    break;
 
-            default: 
-            break;
-    
-          }
+  default:
+    break;
+  }
 }
 
 //Calibration routine for green-nir handler
-void green_nir_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
-{
-    switch (LED_Sel)
-          {
+void green_nir_calib(signed long LED1, signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase) {
+  switch (LED_Sel) {
 
-            case 1: //LED1 Green
-              CalibrateAFE4404(LED1, LED2, LED_phase);
-            break;
+  case 1: //LED1 Green
+    CalibrateAFE4404(LED1, LED2, LED_phase);
+    break;
 
-            case 3: //LED3 NIR
-              CalibrateAFE4404(LED3, AMB1, LED_phase); //Use LED2 as the ambient
-            break; 
+  case 3:                                    //LED3 NIR
+    CalibrateAFE4404(LED3, AMB1, LED_phase); //Use LED2 as the ambient
+    break;
 
-            default: 
-            break;
-    
-          }
+  default:
+    break;
+  }
 }
 
 //calibration routine for green-red handler
-void green_red_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
-{
-    switch (LED_Sel)
-          {
+void green_red_calib(signed long LED1, signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase) {
+  switch (LED_Sel) {
 
-            case 1: //LED1 Green
-              CalibrateAFE4404(LED1, AMB1, LED_phase);
-            break;
-    
-            case 2: //LED 2 Red
-              CalibrateAFE4404(LED2, AMB1, LED_phase); //Use LED3 as the ambient cancellation reference
-            break;
+  case 1: //LED1 Green
+    CalibrateAFE4404(LED1, AMB1, LED_phase);
+    break;
 
-            default: 
-            break;
-   
-          }
+  case 2:                                    //LED 2 Red
+    CalibrateAFE4404(LED2, AMB1, LED_phase); //Use LED3 as the ambient cancellation reference
+    break;
+
+  default:
+    break;
+  }
 }
 
 //Calibration routine for red-nir handler
-void red_nir_calib(signed long LED1,signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase)
-{
-    switch (LED_Sel)
-          {
-    
-            case 2: //LED 2 Red
-              CalibrateAFE4404(LED2, LED1, LED_phase); //Use the green LED phase as the ambient calibration for red 
-            break;
+void red_nir_calib(signed long LED1, signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase) {
+  switch (LED_Sel) {
 
-            case 3: //LED3 NIR
-              CalibrateAFE4404(LED3, AMB1, LED_phase);
-            break; 
+  case 2:                                    //LED 2 Red
+    CalibrateAFE4404(LED2, LED1, LED_phase); //Use the green LED phase as the ambient calibration for red
+    break;
 
-            default: 
-            break;
-    
-          }
+  case 3: //LED3 NIR
+    CalibrateAFE4404(LED3, AMB1, LED_phase);
+    break;
+
+  default:
+    break;
+  }
 }
 
-//Routine handler for calibrating each LED individually 
-void postCalib(signed long LED1, signed long LED2,signed long LED3, signed long AMB1, uint8_t LED_phase)
-{
-        switch (LED_phase) 
-        {
-          case 0x01: //NIR phase only
-            CalibrateAFE4404(LED3, AMB1,LED_phase);
-          break;
+//Routine handler for calibrating each LED individually
+void postCalib(signed long LED1, signed long LED2, signed long LED3, signed long AMB1, uint8_t LED_phase) {
+  switch (LED_phase) {
+  case 0x01: //NIR phase only
+    CalibrateAFE4404(LED3, AMB1, LED_phase);
+    break;
 
-          case 0x02: //green phase only
-            CalibrateAFE4404(LED1,AMB1,LED_phase);
-          break;
+  case 0x02: //green phase only
+    CalibrateAFE4404(LED1, AMB1, LED_phase);
+    break;
 
-          case 0x03: //green and nir phase
-            green_nir_calib(LED1,LED2,LED3,AMB1,LED_phase);
-          break;
+  case 0x03: //green and nir phase
+    green_nir_calib(LED1, LED2, LED3, AMB1, LED_phase);
+    break;
 
-          case 0x04: //red ohase only
-            CalibrateAFE4404(LED2, AMB1,LED_phase);
-          break;
+  case 0x04: //red ohase only
+    CalibrateAFE4404(LED2, AMB1, LED_phase);
+    break;
 
-          case 0x05: //red and nir phase
-            red_nir_calib(LED1,LED2,LED3,AMB1,LED_phase);
-          break;
+  case 0x05: //red and nir phase
+    red_nir_calib(LED1, LED2, LED3, AMB1, LED_phase);
+    break;
 
-          case 0x06: //red-green phase
-            green_red_calib(LED1,LED2,LED3,AMB1,LED_phase);
-          break;
+  case 0x06: //red-green phase
+    green_red_calib(LED1, LED2, LED3, AMB1, LED_phase);
+    break;
 
-          case 0x07: //all phases enabled
-            three_phase_calib(LED1,LED2,LED3,AMB1,LED_phase);
-          break;
-        }
-          
+  case 0x07: //all phases enabled
+    three_phase_calib(LED1, LED2, LED3, AMB1, LED_phase);
+    three_phase_calib(LED1, LED2, LED3, AMB1, LED_phase);
+    break;
+  }
 }
 
 void soft_disconnect(void) //for use outside of the ble softdevice handler
@@ -944,11 +945,9 @@ void soft_disconnect(void) //for use outside of the ble softdevice handler
   AFE4404_ADCRDY_Interrupt_Disable();
   AFE4404_Enable_HWPDN();
 
-
   uint32_t err_code;
   err_code = sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
   APP_ERROR_CHECK(err_code);
-  
 }
 
 /**********************************************************************************************************/
@@ -968,7 +967,7 @@ int main(void) {
   I2C_init(BA_SDA_PIN, BA_SCL_PIN);
 
   /*Initialize AFE4404 */
-  AFE4404_RESETZ_Init();         //Initialize the ACTIVE LOW input
+  AFE4404_RESETZ_Init(); //Initialize the ACTIVE LOW input
   AFE4404_ADCRDY_Interrupt_Disable();
 
   AFE4404_Trigger_HWReset(); //Restart the device and reset HW config defaults
@@ -982,7 +981,6 @@ int main(void) {
   DAC_CALIBRATION_AUTOSTART();
   LED_Sel = 1;
   initCalibrationRoutine();
-  
 
   //Power Down the AFE after the DAC-Calibration is completed
   AFE4404_Enable_HWPDN();
@@ -999,19 +997,18 @@ int main(void) {
   peer_manager_init();
   advertising_start(erase_bonds);
 
- printf("STEP 4 ::: BLE Setup  ::: Completed\n");
+  printf("STEP 4 ::: BLE Setup  ::: Completed\n");
 
   /*ENTER WHILE LOOP*/
   while (1) {
 
-    bool streaming_select = ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)); //This will be true when we want to stream data to the phone. 
-    bool programming_select = ((apptimerrunning == 1) && (programming)); //This will be true when we only want to programm the device.
+    bool streaming_select = ((apptimerrunning == 1) && (readDataFlag == 1) && (streaming)); //This will be true when we want to stream data to the phone.
+    bool programming_select = ((apptimerrunning == 1) && (programming));                    //This will be true when we only want to programm the device.
     //If the app timer is running then we are in a valid connection and we are okay to collect data and send it out
-    if (streaming_select)
-     {
+    if (streaming_select) {
 
-      AFE4404_ADCRDY_Interrupt_Disable();              //Stop the processing and go ahead with dumping the data in;
-      readDataFlag = 0;                                //Clear Read flag and pump out current ADC values
+      AFE4404_ADCRDY_Interrupt_Disable(); //Stop the processing and go ahead with dumping the data in;
+      readDataFlag = 0;                   //Clear Read flag and pump out current ADC values
 
       //Store reads locally into buffer
       AFE_Buffer[0] = AFE4404_Reg_Read(42); //LED2
@@ -1027,41 +1024,47 @@ int main(void) {
       test[2] = (int32_t)(AFE_Buffer[2]); //Get NIR-AMB1 val reg
       test[3] = (int32_t)(AFE_Buffer[3]); //Get AMB1 val reg
       test[4] = time_tick_update;
-     
+
       //Use memcpy to get the correct blocks from the data to then send on over to the sensor update function
-      uint8_t test_nibble[24];
+      uint8_t test_nibble[20];
 
       memcpy(test_nibble, &test, sizeof(test));
 
       sensor2_characteristic_update(&m_sensor_service, test_nibble);
-
-      //We want Calibrate the system each time that we wake-up to start measuring values 
-      if(Calibration == 1) //first time we enter the statement 
-      {
-        if(CALIBRATION_ENABLED == true)
-        {
-          postCalib(AFE_Buffer[1], AFE_Buffer[0], AFE_Buffer[2], AFE_Buffer[3],LED_phase);
-        }
-      }
-
       prfcount++;
-      if (prfcount == CALIB_PRF_UPDATE) //Each count update is at 10ms, or whatever the set sampling frequency is. Default = 15 minutes
+
+      //We want Calibrate the system each time that we wake-up to start measuring values
+      if (CALIBRATION_ENABLED && (Calibration == 1)) //first time we enter the statement
       {
-        g_OneSecondFlag = 1;
-        Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
-        prfcount = 0;
-      }
+          postCalib(AFE_Buffer[1], AFE_Buffer[0], AFE_Buffer[2], AFE_Buffer[3], LED_phase);
+        }
+
+        if (prfcount == CALIB_PRF_UPDATE) //Each count update is at 10ms, or whatever the set sampling frequency is. Default = 15 minutes
+        {
+          g_OneSecondFlag = 1;
+          Calibration = 1; //This will raise the flag for the calibration to be redone for the PPG sensor
+          prfcount = 0;
+        }
+
+       if (CALIBRATION_FINISHED) //This is to send the updated afe configuration identified by the calib routine
+        {
+
+          CALIBRATION_FINISHED = false;
+          afe_read_settings(LED_phase);
+
+          sensor1_characteristic_update(&m_sensor_service, setting_8b);
+        }
+
+
       AFE4404_ADCRDY_Interrupt_Enable();
     }
 
-    //If programming is selected, program the AFE here 
-    else if (programming_select)
-    {
-        printf("Prog Service Update \n");
-        Calibration = 1;
-        program_AFE4404(developer_mode,LED_phase,LED1_drive,LED2_drive,LED3_drive,TIA_R1,TIA_C1,en_sep,TIA_R2,TIA_C2);
-        programming = false; 
-        soft_disconnect();
+    //If programming is selected, program the AFE here
+    else if (programming_select) {
+      printf("Prog Service Update \n");
+      program_AFE4404(developer_mode, LED_phase, LED1_drive, LED2_drive, LED3_drive, TIA_R1, TIA_C1, en_sep, TIA_R2, TIA_C2, DAC1_off, DAC2_off, DAC3_off, DACA_off);
+      programming = false;
+      soft_disconnect();
     }
 
   } //End of while change log

@@ -11,6 +11,7 @@ extern volatile BLE_CONNECTED;
 extern uint16_t stream_service;
 extern uint16_t prog_service;
 extern uint16_t time_monitor_service;
+extern uint16_t readback_service;
 
 // function for some housekeeping of ble connections related to the sensor service and characteristic
 void ble_sensor_service_on_ble_evt(ble_evt_t const * p_ble_evt, void * p_context)
@@ -86,9 +87,9 @@ static uint32_t sensor_char1_add(ble_os_t * p_sensor_service)
 		attr_char_value.p_attr_md   = &attr_md;
     
     // SENSOR_JOB: Step 2.H, Set characteristic length in number of bytes
-		attr_char_value.max_len     = 2;
-		attr_char_value.init_len    = 2;
-		uint8_t value[2]            = {0x00,0x00};
+		attr_char_value.max_len     = 20;
+		attr_char_value.init_len    = 20;
+		uint8_t value[20]            = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 		attr_char_value.p_value     = value;
 
     // SENSOR_JOB: Step 2.E, Add sensor new characteristic to the service
@@ -208,9 +209,9 @@ static uint32_t sensor_char3_add(ble_os_t * p_sensor_service)
 		attr_char_value.p_attr_md   = &attr_md;
     
     // SENSOR_JOB: Step 2.H, Set characteristic length in number of bytes
-		attr_char_value.max_len     = 10;
-		attr_char_value.init_len    = 10;
-		uint8_t value[10]            = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+		attr_char_value.max_len     = 14;
+		attr_char_value.init_len    = 14;
+		uint8_t value[14]            = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 		attr_char_value.p_value     = value;
 
     // SENSOR_JOB: Step 2.E, Add sensor new characteristic to the service
@@ -378,6 +379,7 @@ void sensor_service_init(ble_os_t * p_sensor_service)
 
 
     //Set up handle capture 
+    readback_service = p_sensor_service->char1_handles.value_handle;
     stream_service = p_sensor_service->char2_handles.cccd_handle;
     prog_service = p_sensor_service->char3_handles.value_handle;
     time_monitor_service = p_sensor_service->char4_handles.value_handle;
@@ -385,12 +387,12 @@ void sensor_service_init(ble_os_t * p_sensor_service)
 }
 
 // ALREADY_DONE_FOR_YOU: Function to be called when updating characteristic value
-void sensor1_characteristic_update(ble_os_t *p_sensor_service, int32_t *temp)
+void sensor1_characteristic_update(ble_os_t *p_sensor_service, uint8_t *temp)
 {
     // SENSOR_JOB: Step 3.E, Update characteristic value
 		if (p_sensor_service->conn_handle != BLE_CONN_HANDLE_INVALID)
 		{
-				uint16_t               len = 2;
+				uint16_t               len = 20;
 				ble_gatts_hvx_params_t hvx_params;
 				memset(&hvx_params, 0, sizeof(hvx_params));
 
@@ -398,7 +400,7 @@ void sensor1_characteristic_update(ble_os_t *p_sensor_service, int32_t *temp)
 				hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
 				hvx_params.offset = 0;
 				hvx_params.p_len  = &len;
-				hvx_params.p_data = (uint8_t*)temp;  
+				hvx_params.p_data = temp;  
 
 				sd_ble_gatts_hvx(p_sensor_service->conn_handle, &hvx_params);
 		}

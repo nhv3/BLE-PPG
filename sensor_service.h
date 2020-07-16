@@ -55,7 +55,7 @@ void sensor_service_init(ble_os_t * p_sensor_service);
  * @param[in]   p_sensor_service                     Our Service structure.
  * @param[in]   characteristic_value     New characteristic value.
  */
-void sensor1_characteristic_update(ble_os_t *p_sensor_service, int32_t *temp);
+void sensor1_characteristic_update(ble_os_t *p_sensor_service, uint8_t *temp);
 void sensor2_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch1);
 void sensor3_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch2);
 void sensor4_characteristic_update(ble_os_t *p_sensor_service, uint8_t *ch3);
