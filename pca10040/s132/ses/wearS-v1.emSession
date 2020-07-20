@@ -66,8 +66,8 @@
   <Watches active="0" update="Never"/>
  </Watch4>
  <Files>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="56" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.c" selected="0" top="135" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="32" y="71" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../wearS_BLE_V1/AFE4404.c" selected="0" top="79" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="11" y="1401" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.c" selected="0" top="1375" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="71" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../wearS_BLE_V1/AFE4404.c" selected="0" top="53" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="187" useTextEdit="1" useBinaryEdit="0" left="0" path="/Applications/SEGGER Embedded Studio for ARM 4.42/include/string.h" selected="0" top="160" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="326" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.h" selected="0" top="303" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="163" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE4404.c" selected="0" top="43" codecName="Default"/>
@@ -94,9 +94,9 @@
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="0" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.c" selected="0" top="336" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="61" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../../../../components/softdevice/s132/headers/nrf_error.h" selected="0" top="36" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="133" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../Calibration_AFE4404.h" selected="0" top="88" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="390" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.c" selected="1" top="285" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="44" y="199" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.c" selected="0" top="96" codecName="Default"/>
   <SessionOpenFile windowGroup="DockEditLeft" x="0" y="6" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../AFE_programmer.h" selected="0" top="0" codecName="Default"/>
-  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="955" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="0" top="984" codecName="Default"/>
+  <SessionOpenFile windowGroup="DockEditLeft" x="0" y="1067" useTextEdit="1" useBinaryEdit="0" left="0" path="../../../main.c" selected="1" top="967" codecName="Default"/>
  </Files>
- <ARMCrossStudioWindow activeProject="nrf52-ble-tutorial-characteristic" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;C:/nordic_semi/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:/Users/tasif/Dropbox/hardware-nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nRF_Startup.s&#xa;&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nrf52_Vectors.s&#xa;" fileDialogInitialDirectory="/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG" debugSearchPath="" autoConnectCapabilities="3711"/>
+ <ARMCrossStudioWindow activeProject="nrf52-ble-tutorial-characteristic" fileDialogDefaultFilter="*.c" autoConnectTarget="J-Link" buildConfiguration="Debug" sessionSettings="" debugSearchFileMap="/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.c&#xa;C:/nordic_semi/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:/Users/tasif/Dropbox/hardware-nordic/nRF5_SDK_15.0.0_a53641a/modules/nrfx/mdk/ses_nrf52_Vectors.s&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nRF_Startup.s&#xa;&#xa;C:\Users\tasif\Dropbox\hardware-nordic\nRF5_SDK_15.0.0_a53641a\modules\nrfx\mdk/ses_nrf52_Vectors.s&#xa;" fileDialogInitialDirectory="/Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG" debugSearchPath="" autoConnectCapabilities="3199"/>
 </session>

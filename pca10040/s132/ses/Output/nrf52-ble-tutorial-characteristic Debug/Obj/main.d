@@ -1,10 +1,10 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/main.o: \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/main.c \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/AFE4404.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/AFE_programmer.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/main.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE_programmer.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/Calibration_AFE4404.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/I2C.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/I2C.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  ../../../../../../components/boards/boards.h \
@@ -108,9 +108,9 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/main.o: \
  ../../../../../../components/libraries/bsp/bsp_btn_ble.h \
  ../../../../../../components/libraries/bsp/bsp.h \
  ../../../../../../components/libraries/button/app_button.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/custom_board.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/custom_board.h \
  ../../../../../../components/libraries/fds/fds.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/hrm.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/hrm.h \
  ../../../../../../components/ble/nrf_ble_gatt/nrf_ble_gatt.h \
  ../../../../../../components/ble/nrf_ble_qwr/nrf_ble_qwr.h \
  ../../../../../../integration/nrfx/legacy/nrf_drv_gpiote.h \
@@ -140,6 +140,6 @@ Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/main.o: \
  ../../../../../../components/ble/common/ble_gatt_db.h \
  ../../../../../../components/ble/peer_manager/peer_database.h \
  ../../../../../../components/ble/peer_manager/peer_manager_internal.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/sensor_service.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/sensor_service.h \
  ../../../../../../components/libraries/sensorsim/sensorsim.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/math.h

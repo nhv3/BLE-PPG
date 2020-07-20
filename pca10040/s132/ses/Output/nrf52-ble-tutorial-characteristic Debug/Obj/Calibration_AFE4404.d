@@ -1,8 +1,8 @@
 Output/nrf52-ble-tutorial-characteristic\ Debug/Obj/Calibration_AFE4404.o: \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/Calibration_AFE4404.c \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/Calibration_AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.c \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/Calibration_AFE4404.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdint.h \
- /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG-Calibration-Integ/AFE4404.h \
+ /Users/Nordic/nRF5_SDK_15.0.0_a53641a/examples/peripheral/BLE-PPG/AFE4404.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/stdio.h \
  /Applications/SEGGER\ Embedded\ Studio\ for\ ARM\ 4.42/include/__crossworks.h \
  ../../../../../../components/libraries/delay/nrf_delay.h \
