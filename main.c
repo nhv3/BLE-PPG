@@ -93,21 +93,21 @@ process in the world. Grab a bottle of wine, whisky, beer, whatever and buckle u
 #define SEC_PARAM_MAX_KEY_SIZE 16                      /**< Maximum encryption key size. */
 #define DEAD_BEEF 0xDEADBEEF                           /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
-#define BA_SDA_PIN 27      // SDA signal pin for the current Arduino Breakout Board
-#define BA_SCL_PIN 26      // SCL signal pin for the current Arduino Breakout Board
-#define AMB_LED_1_VAL 0x2D // Register for the ambient value from phase 1
+#define BA_SDA_PIN 12      // SDA signal pin for the current Arduino Breakout Board //12 yasser
+#define BA_SCL_PIN 13      // SCL signal pin for the current Arduino Breakout Board //13 yasser
+#define AMB_LED_1_VAL 0x2D // Register for the amb   ient value from phase 1
 
 #define CALIB_PRF_UPDATE 900000 //*Number of readings that need to elapse before we calibrate again. Each reading happens every 10ms, so each tick is ~10ms**/
 
-int RESETZ = 2;   //GPIO Pin number for RST on the AFE4404
-int ADC_RDY = 25; //GPIO Pin number for RDY pin on AFE4404
+int RESETZ = 8;   //GPIO Pin number for RST on the AFE4404 //8 yasser board
+int ADC_RDY = 6; //GPIO Pin number for RDY pin on AFE4404 //6 yasser board
 
 volatile int readDataFlag = 0;       //Flag for when ADC_RDY is triggered
 volatile int g_OneSecondFlag = 0;    //Flag for peridoic calibration if enabled
 volatile int apptimerrunning = 0;    //Flag for when the app timer is running
 volatile int issue_disconnect = 0;   //Flag for when we need to issue a disconnection from the perihperal
 volatile int offsetDACcalibFlag = 0; //Flag for the current offset computation of the AFE\
-volatile int prfcount = 0; //Keeps track of the amount of ticks for CALIB_PRF_UPDATE
+
 volatile int32_t ticks_now = 0;      //Keeps track of the current elpased ticks from RTC when polled
 volatile char LED_Sel = 1;           //Current Selction of LED, 1 2 or 3
 
@@ -175,6 +175,7 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 
 APP_TIMER_DEF(m_sensor_char_timer_id); // Declare an app_timer id variable and define sensor timer interval and define a timer interval
 
+volatile int prfcount = 0; //Keeps track of the amount of ticks for CALIB_PRF_UPDATE
 /**********************************************************************************************************/
 /*                                              BEGIN FUNCTION DECLARATIONS                               */
 /**********************************************************************************************************/
@@ -521,6 +522,11 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context) {
 
     //Recall the last saved prog update
     AFE4404_Reg_Write(0, 0x0); //CONTROL0
+    AFE4404_Reg_Write(AFE_DAC_SETTING_REG, 0x00000000);
+    AFE4404_Reg_Write(AFE_TIAAMBGAIN,0x00000000);
+    AFE4404_Reg_Write(AFE_TIAGAIN, 0x00000000);
+    AFE4404_Reg_Write(AFE_LEDCNTRL, 0x00000000);
+
     AFE4404_Reg_Write(AFE_DAC_SETTING_REG, dac_set);
     AFE4404_Reg_Write(AFE_TIAAMBGAIN, main_tia_gain);
     AFE4404_Reg_Write(AFE_TIAGAIN, sep_gain);
@@ -826,9 +832,6 @@ void ADC_READY_GPIO_HANDLER_INIT(void) {
   err_code = nrf_drv_gpiote_in_init(ADC_RDY, &in_config, ADCRDY_HANDLER);
   APP_ERROR_CHECK(err_code);
 
-  //Turn on GPIO for LED
-  err_code = nrf_drv_gpiote_out_init(17, &out_config);
-  APP_ERROR_CHECK(err_code);
 }
 
 //Function for calibrating the DAC offset with PD disconnected. Runs once at start up and then ceases. Its for the inherient offset in the input.
@@ -972,11 +975,9 @@ int main(void) {
 
   //Boot up operations for LOG, Timer, Power-MAN, and I2C
   bool erase_bonds;
-  log_init();
   timers_init();
   power_management_init();
   ADC_READY_GPIO_HANDLER_INIT();
-  nrf_delay_ms(10);
 
   /*Initialize I2C interface - 400k baud*/
   I2C_init(BA_SDA_PIN, BA_SCL_PIN);
@@ -985,6 +986,7 @@ int main(void) {
   AFE4404_RESETZ_Init(); //Initialize the ACTIVE LOW input
   AFE4404_ADCRDY_Interrupt_Disable();
   AFE4404_Trigger_HWReset(); //Restart the device and reset HW config defaults
+
 
   /*Program the AFE4404*/
   AFE4404_Init(); //Initilaizes all the ports needed perihperal to the AFE

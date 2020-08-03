@@ -56,7 +56,7 @@ const unsigned long AMB123_mask_LED = 0x0F83FF;					// Mask for OFFDAC for LED1,
 const unsigned int ILED_CURR_MIN_code = 1; 							// LED min current reqd. for application - 3.2 mA assuming 100mA range (This is default value)
 const unsigned int ILED_CURR_MAX_code = 6; 							// LED max current reqd. for application - 88 mA assuming 100mA range (This is default value)
 
-const short unsigned int LOW_THR_PERCENT = 30;       			// Low Threshold Percent
+const short unsigned int LOW_THR_PERCENT = 10;       			// Low Threshold Percent
 const short unsigned int HIGH_THR_PERCENT = 90;      			// High Threshold percent
 const short unsigned int HYS_PERCENT = 3;            			// Hysteresis percent
 const short int TARGET_THR_PERCENT = 50;    					// Target Threshold percent
